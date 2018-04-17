@@ -3,18 +3,78 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Hugh {
+    class Player {
+        Game1 game;
+
+        Texture2D texture;
+
+        Vector2 position;
+        Vector2 size;
+        Vector2 velocity;
+
+        public Player(Game1 game, Vector2 position) {
+            this.game = game;
+            this.position = position;
+            this.velocity = new Vector2(100, 100);
+        }
+
+        public void Update(float dt) {
+            position.X += velocity.X * dt;
+            position.Y += velocity.Y * dt;
+
+            float viewWidth  = game.GraphicsDevice.Viewport.Bounds.Width;
+            float viewHeight = game.GraphicsDevice.Viewport.Bounds.Height;
+
+            if (position.X < 0 || position.X + size.X > viewWidth) {
+                velocity.X = - velocity.X;
+            }
+
+            if (position.Y < 0 || position.Y + size.Y > viewHeight) {
+                velocity.Y = - velocity.Y;
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Right)) {
+                velocity.X += 100 * dt;
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Left)) {
+                velocity.X -= 100 * dt;
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Up)) {
+                velocity.Y -= 100 * dt;
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Down)) {
+                velocity.Y += 100 * dt;
+            }
+        }
+
+        public void Draw() {
+            game.spriteBatch.Begin();
+            
+            SpriteEffects effects = velocity.X > 0
+                ? SpriteEffects.None
+                : SpriteEffects.FlipHorizontally;
+
+            game.spriteBatch.Draw(texture, position, null, Color.White,
+                                  0, Vector2.Zero, new Vector2(1, 1), effects, 1f);
+
+            game.spriteBatch.End();
+        }
+
+        public void LoadContent() {
+            texture = game.Content.Load<Texture2D>("idle_0");
+            size = new Vector2(texture.Width, texture.Height);
+        }
+    }
+
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
     public class Game1 : Game {
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
 
-        Texture2D playerTexture;
-        
-        Vector2 playerSize;
-        Vector2 playerPosition;
-        Vector2 playerVelocity;
+        public SpriteBatch spriteBatch;
+
+        Player player;
         
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
@@ -28,8 +88,7 @@ namespace Hugh {
         /// and initialize them as well.
         /// </summary>
         protected override void Initialize() {
-            // TODO: Add your initialization logic here
-
+            player = new Player(this, new Vector2(0, 0));
             base.Initialize();
         }
 
@@ -40,12 +99,7 @@ namespace Hugh {
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            playerTexture = this.Content.Load<Texture2D>("idle_0");
-
-            playerSize = new Vector2(playerTexture.Width, playerTexture.Height);
-            playerPosition = new Vector2(0, 0);
-            playerVelocity = new Vector2(100, 100);
+            player.LoadContent();
         }
 
         /// <summary>
@@ -66,21 +120,7 @@ namespace Hugh {
                 Exit();
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            playerPosition.X += playerVelocity.X * dt;
-            playerPosition.Y += playerVelocity.Y * dt;
-
-            float viewWidth  = (float)GraphicsDevice.Viewport.Bounds.Width;
-            float viewHeight = (float)GraphicsDevice.Viewport.Bounds.Height;
-
-            if (playerPosition.X < 0 || playerPosition.X + playerSize.X > viewWidth) {
-                playerVelocity.X = - playerVelocity.X;
-            }
-
-            if (playerPosition.Y < 0 || playerPosition.Y + playerSize.Y > viewHeight) {
-                playerVelocity.Y = - playerVelocity.Y;
-            }
-
+            player.Update(dt);
             base.Update(gameTime);
         }
 
@@ -90,17 +130,7 @@ namespace Hugh {
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.LightGreen);
-
-            spriteBatch.Begin();
-
-            SpriteEffects effects = playerVelocity.X > 0
-                ? SpriteEffects.None
-                : SpriteEffects.FlipHorizontally;
-            spriteBatch.Draw(playerTexture, playerPosition, null, Color.White,
-                             0, Vector2.Zero, new Vector2(1, 1), effects, 1f);
-
-            spriteBatch.End();
-            
+            player.Draw();
             base.Draw(gameTime);
         }
     }
