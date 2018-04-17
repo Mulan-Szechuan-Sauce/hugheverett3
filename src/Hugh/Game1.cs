@@ -3,6 +3,28 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Hugh {
+    class Controller {
+        private static bool IsKeyDown(Keys key) {
+            return Keyboard.GetState().IsKeyDown(key);
+        }
+
+        public static bool isLeftPressed() {
+            return IsKeyDown(Keys.Left) || IsKeyDown(Keys.A);
+        }
+
+        public static bool isRightPressed() {
+            return IsKeyDown(Keys.Right) || IsKeyDown(Keys.E);
+        }
+
+        public static bool isUpPressed() {
+            return IsKeyDown(Keys.Up) || IsKeyDown(Keys.OemComma);
+        }
+
+        public static bool isDownPressed() {
+            return IsKeyDown(Keys.Down) || IsKeyDown(Keys.O);
+        }
+    }
+
     class Player {
         Game1 game;
 
@@ -33,16 +55,16 @@ namespace Hugh {
                 velocity.Y = - velocity.Y;
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Right)) {
+            if (Controller.isRightPressed()) {
                 velocity.X += 100 * dt;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.Left)) {
+            if (Controller.isLeftPressed()) {
                 velocity.X -= 100 * dt;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.Up)) {
+            if (Controller.isUpPressed()) {
                 velocity.Y -= 100 * dt;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.Down)) {
+            if (Controller.isDownPressed()) {
                 velocity.Y += 100 * dt;
             }
         }
