@@ -12,6 +12,10 @@ namespace Hugh {
 
         Texture2D playerTexture;
         
+        Vector2 playerSize;
+        Vector2 playerPosition;
+        Vector2 playerVelocity;
+        
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -38,6 +42,10 @@ namespace Hugh {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             playerTexture = this.Content.Load<Texture2D>("idle_0");
+
+            playerSize = new Vector2(playerTexture.Width, playerTexture.Height);
+            playerPosition = new Vector2(0, 0);
+            playerVelocity = new Vector2(100, 100);
         }
 
         /// <summary>
@@ -57,7 +65,21 @@ namespace Hugh {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            playerPosition.X += playerVelocity.X * dt;
+            playerPosition.Y += playerVelocity.Y * dt;
+
+            float viewWidth  = (float)GraphicsDevice.Viewport.Bounds.Width;
+            float viewHeight = (float)GraphicsDevice.Viewport.Bounds.Height;
+
+            if (playerPosition.X < 0 || playerPosition.X + playerSize.X > viewWidth) {
+                playerVelocity.X = - playerVelocity.X;
+            }
+
+            if (playerPosition.Y < 0 || playerPosition.Y + playerSize.Y > viewHeight) {
+                playerVelocity.Y = - playerVelocity.Y;
+            }
 
             base.Update(gameTime);
         }
@@ -67,10 +89,16 @@ namespace Hugh {
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.LightGreen);
 
             spriteBatch.Begin();
-            spriteBatch.Draw(playerTexture, Vector2.Zero);
+
+            SpriteEffects effects = playerVelocity.X > 0
+                ? SpriteEffects.None
+                : SpriteEffects.FlipHorizontally;
+            spriteBatch.Draw(playerTexture, playerPosition, null, Color.White,
+                             0, Vector2.Zero, new Vector2(1, 1), effects, 1f);
+
             spriteBatch.End();
             
             base.Draw(gameTime);
