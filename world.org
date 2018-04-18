@@ -1,14 +1,16 @@
 * Gameplay
 
-  Eli: It would be cool to have a passive storyline - for instance, if you want to, you could stop and listen to what people are talking about, or you could sneak past them / kill them / whatever
+  It would be cool to have a passive storyline - for instance, if you want to, you could stop and listen to what people are talking about, or you could sneak past them / kill them / whatever
+
+  Every character must arrive at the end goal simultaneously.
 
 * World Building
   
-  Eli: I kind of want to make the game start on a happy note, maybe an outdoors theme. But then it gets darker / more messed up.
+  I kind of want to make the game start on a happy note, maybe an outdoors theme. But then it gets darker / more messed up.
 
 * Plot
 
-  Eli: Something something sci fi something something magic? something something fantasy? Any sufficiently advanced technology is indistinguishable from magic.
+  Something something sci fi something something magic? something something fantasy? Any sufficiently advanced technology is indistinguishable from magic.
 
 * Development Notes
   
@@ -26,7 +28,3 @@
   Each level can have an associated Lua script... but that will come in the future!
   
   I was looking at how MegaMan handled collisions and tiling, and we can totally do something similar.
-
-
-
-  First things first, let's create a very simple prototype, using crappy graphics. Blocky, but functional. Hard code everything!

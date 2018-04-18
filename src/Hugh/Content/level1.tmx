@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" tiledversion="1.1.4" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
  <tileset firstgid="1" source="tileset.tsx"/>
- <layer name="Tile Layer 1" width="100" height="100">
+ <layer name="universal" width="100" height="100" locked="1">
   <data encoding="base64" compression="zlib">
-   eJzt1LEKACEIANDqjv7/k6Ot4QpCGo7eA8FBHRRMCQAAAAAAAIA/q0P+BmeVYP/NnklE+3dmsLZ7D87qO84fMavlrNUP8pcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALhRA3rWAGk=
+   eJzt2lEGACAMANAU3f/IXSBNjErvsa+S2djPKgUAAAAAAACAl/XTCQAstCBmdzhD7e+iH3dZzTAAAAAAAADgTZn/rmriW7+K9rK75wAAAAAAAAAAAAAAAAAAAAAAAAAAAJBhAMk6AHs=
+  </data>
+ </layer>
+ <layer name="world1" width="100" height="100" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJzt0SEOACAQA8Em9/8/o8+AIIETM7amySYAAAAAAAAAAAAAAAAAAAAAvFC/D9DoMVtl3+i0AwAAAAAAAAAAAAAAAAAAAAAAAAAAwI0FywIAEw==
+  </data>
+ </layer>
+ <layer name="world2" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   eJzt1sEKQBEURVHl///ZmOhl8DhqrVKGsqlbCgAAAAAAAAAAAAAAAADAnnr7AHT0yKJHFj2y6JGlDvvZ4pyv+9bjLD2gt/Pm/Y//6ZFlNUeZrwAAAAAAAAAAAAAAAAAAAAAAAAAA3tcAjFMAYQ==
   </data>
  </layer>
 </map>
