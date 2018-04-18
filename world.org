@@ -26,3 +26,7 @@
   Each level can have an associated Lua script... but that will come in the future!
   
   I was looking at how MegaMan handled collisions and tiling, and we can totally do something similar.
+
+
+
+  First things first, let's create a very simple prototype, using crappy graphics. Blocky, but functional. Hard code everything!
