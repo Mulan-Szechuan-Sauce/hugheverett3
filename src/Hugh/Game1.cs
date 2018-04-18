@@ -2,6 +2,11 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+using System;
+using System.Collections.Generic;
+
+using TiledSharp;
+
 namespace Hugh {
     class Controller {
         private static bool IsKeyDown(Keys key) {
@@ -25,69 +30,6 @@ namespace Hugh {
         }
     }
 
-    class Player {
-        Game1 game;
-
-        Texture2D texture;
-
-        Vector2 position;
-        Vector2 size;
-        Vector2 velocity;
-
-        public Player(Game1 game, Vector2 position) {
-            this.game = game;
-            this.position = position;
-            this.velocity = new Vector2(100, 100);
-        }
-
-        public void Update(float dt) {
-            position.X += velocity.X * dt;
-            position.Y += velocity.Y * dt;
-
-            float viewWidth  = game.GraphicsDevice.Viewport.Bounds.Width;
-            float viewHeight = game.GraphicsDevice.Viewport.Bounds.Height;
-
-            if (position.X < 0 || position.X + size.X > viewWidth) {
-                velocity.X = - velocity.X;
-            }
-
-            if (position.Y < 0 || position.Y + size.Y > viewHeight) {
-                velocity.Y = - velocity.Y;
-            }
-
-            if (Controller.isRightPressed()) {
-                velocity.X += 100 * dt;
-            }
-            if (Controller.isLeftPressed()) {
-                velocity.X -= 100 * dt;
-            }
-            if (Controller.isUpPressed()) {
-                velocity.Y -= 100 * dt;
-            }
-            if (Controller.isDownPressed()) {
-                velocity.Y += 100 * dt;
-            }
-        }
-
-        public void Draw() {
-            game.spriteBatch.Begin();
-            
-            SpriteEffects effects = velocity.X > 0
-                ? SpriteEffects.None
-                : SpriteEffects.FlipHorizontally;
-
-            game.spriteBatch.Draw(texture, position, null, Color.White,
-                                  0, Vector2.Zero, new Vector2(1, 1), effects, 1f);
-
-            game.spriteBatch.End();
-        }
-
-        public void LoadContent() {
-            texture = game.Content.Load<Texture2D>("idle_0");
-            size = new Vector2(texture.Width, texture.Height);
-        }
-    }
-
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -96,7 +38,13 @@ namespace Hugh {
 
         public SpriteBatch spriteBatch;
 
-        Player player;
+        TmxMap map;
+        Texture2D tileset;
+
+        int tileWidth;
+        int tileHeight;
+        int tilesetTilesWide;
+        int tilesetTilesHigh;
         
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
@@ -110,7 +58,6 @@ namespace Hugh {
         /// and initialize them as well.
         /// </summary>
         protected override void Initialize() {
-            player = new Player(this, new Vector2(0, 0));
             base.Initialize();
         }
 
@@ -121,7 +68,16 @@ namespace Hugh {
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            player.LoadContent();
+
+            map = new TmxMap("Content/level1.tmx");
+
+            tileset = Content.Load<Texture2D>(map.Tilesets[0].Name.ToString());
+
+            tileWidth = map.Tilesets[0].TileWidth;
+            tileHeight = map.Tilesets[0].TileHeight;
+
+            tilesetTilesWide = tileset.Width / tileWidth;
+            tilesetTilesHigh = tileset.Height / tileHeight;
         }
 
         /// <summary>
@@ -142,7 +98,6 @@ namespace Hugh {
                 Exit();
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            player.Update(dt);
             base.Update(gameTime);
         }
 
@@ -151,8 +106,52 @@ namespace Hugh {
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.LightGreen);
-            player.Draw();
+            GraphicsDevice.Clear(Color.White);
+
+            spriteBatch.Begin();
+
+            for (var i = 0; i < map.Layers[0].Tiles.Count; i++) {
+                int gid = map.Layers[0].Tiles[i].Gid;
+
+                // Empty tile, do nothing
+                if (gid == 0) {
+                    continue;
+                }
+
+                int tileFrame = gid - 1;
+                int column = tileFrame % tilesetTilesWide;
+                int row = (int)Math.Floor((double)tileFrame / (double)tilesetTilesWide);
+
+                float x = (i % map.Width) * map.TileWidth;
+                float y = (float)Math.Floor(i / (double)map.Width) * map.TileHeight;
+
+                Rectangle tilesetRec = new Rectangle(tileWidth * column, tileHeight * row, tileWidth, tileHeight);
+
+                spriteBatch.Draw(tileset, new Rectangle((int)x, (int)y, tileWidth, tileHeight), tilesetRec, Color.White);
+            }
+
+            for (var i = 0; i < map.Layers[1].Tiles.Count; i++) {
+                int gid = map.Layers[1].Tiles[i].Gid;
+
+                // Empty tile, do nothing
+                if (gid == 0) {
+                    continue;
+                }
+
+                int tileFrame = gid - 1;
+                int column = tileFrame % tilesetTilesWide;
+                int row = (int)Math.Floor((double)tileFrame / (double)tilesetTilesWide);
+
+                float x = (i % map.Width) * map.TileWidth;
+                float y = (float)Math.Floor(i / (double)map.Width) * map.TileHeight;
+
+                Rectangle tilesetRec = new Rectangle(tileWidth * column, tileHeight * row, tileWidth, tileHeight);
+
+                spriteBatch.Draw(tileset, new Rectangle((int)x, (int)y, tileWidth, tileHeight), tilesetRec, Color.White);
+            }
+
+            spriteBatch.End();
+
             base.Draw(gameTime);
         }
     }

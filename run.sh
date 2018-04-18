@@ -7,4 +7,5 @@ set -e
 cd src
 msbuild
 
-exec mono Hugh/bin/DesktopGL/AnyCPU/Debug/Hugh.exe
+cd Hugh
+exec mono bin/DesktopGL/AnyCPU/Debug/Hugh.exe
