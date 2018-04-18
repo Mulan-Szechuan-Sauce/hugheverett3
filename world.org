@@ -1,3 +1,28 @@
 * Gameplay
+
+  Eli: It would be cool to have a passive storyline - for instance, if you want to, you could stop and listen to what people are talking about, or you could sneak past them / kill them / whatever
+
 * World Building
+  
+  Eli: I kind of want to make the game start on a happy note, maybe an outdoors theme. But then it gets darker / more messed up.
+
 * Plot
+
+  Eli: Something something sci fi something something magic? something something fantasy? Any sufficiently advanced technology is indistinguishable from magic.
+
+* Development Notes
+  
+  We shall use the Tiled Map Editor! Thus, we will have a tile-based collision system.
+  https://github.com/marshallward/TiledSharp
+  https://github.com/Temeez/TiledSharp-MonoGame-Example
+  http://doc.mapeditor.org/en/stable/manual/layers/#object-layers
+  
+  We could have an object layer to indicate positions of entities such as enemies, the player, etc. Maybe some switches and stuff.
+  
+  There could also be a "background" layer in each world, which is drawn, and cannot be interacted with.
+  
+  There should be several types of layers. ~universal_bg~, ~universal_fg~ for bg and fg among _all_ worlds. For parts of each world that differs, use the ~world0_bg~, ~world0_fg~, ~world1_fg~, etc.
+  
+  Each level can have an associated Lua script... but that will come in the future!
+  
+  I was looking at how MegaMan handled collisions and tiling, and we can totally do something similar.
