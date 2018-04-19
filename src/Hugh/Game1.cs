@@ -47,6 +47,8 @@ namespace Hugh {
         private int x;
         private int y;
 
+        private string type;
+
         // The rectangle of tileset to render for this tile
         public Rectangle TilesetRect {
             get { return new Rectangle(SIZE * column, SIZE * row, SIZE, SIZE); }
@@ -55,12 +57,18 @@ namespace Hugh {
         public float X {get { return (float)this.x * SIZE; }}
         public float Y {get { return (float)this.y * SIZE; }}
 
-        public Tile(int row, int column, int x, int y)
+        public Tile(int row, int column, int x, int y, string type)
         {
             this.row = row;
             this.column = column;
             this.x = x;
             this.y = y;
+            this.type = type;
+        }
+
+        public bool IsGround()
+        {
+            return "ground".Equals(this.type);
         }
     }
 
@@ -97,7 +105,7 @@ namespace Hugh {
          * This should stay be a per-world property, since we can
          * potentiallly have different tileset for each world.
          */
-        private Texture2D tileset;
+        private Texture2D tilesetTexture;
 
         // The interactive tile layer (the only layer for now)
         private Player player;
@@ -123,10 +131,12 @@ namespace Hugh {
             this.width = map.Width;
             this.height = map.Height;
             this.tiles = new Tile[this.width * this.height];
-            this.tileset = game.Content.Load<Texture2D>(map.Tilesets[0].Name.ToString());
 
-            addTilesFromLayer(findLayer(map, "universal"));
-            addTilesFromLayer(findLayer(map, string.Format("world{0}", worldId)));
+            var tileset = map.Tilesets[0];
+            this.tilesetTexture = game.Content.Load<Texture2D>(tileset.Name.ToString());
+
+            AddTilesFromLayer(findLayer(map, "universal"), tileset);
+            AddTilesFromLayer(findLayer(map, string.Format("world{0}", worldId)), tileset);
         }
 
         private TmxLayer findLayer(TmxMap map, string name)
@@ -142,7 +152,7 @@ namespace Hugh {
             return null;
         }
 
-        private void addTilesFromLayer(TmxLayer layer)
+        private void AddTilesFromLayer(TmxLayer layer, TmxTileset tileset)
         {
             for (var i = 0; i < layer.Tiles.Count; i++)
             {
@@ -155,7 +165,7 @@ namespace Hugh {
                     continue;
                 }
 
-                int tilesetTilesWidth = this.tileset.Width / Tile.SIZE;
+                int tilesetTilesWidth = this.tilesetTexture.Width / Tile.SIZE;
 
                 int tileFrame = gid - 1;
                 int column = tileFrame % tilesetTilesWidth;
@@ -164,15 +174,38 @@ namespace Hugh {
                 int x = i % this.width;
                 int y = i / this.width;
 
-                // FIXME this should check a Tiled property (I think the "Type" property)
-                if (tileFrame == 5)
+                string tileType = GetTilesetTileType(tileset, tileFrame);
+
+                if ("player".Equals(tileType))
                 {
                     player = new Player(row, column, new Vector2(x * Tile.SIZE, y * Tile.SIZE));
                     continue;
+                } else {
+                    this.tiles[y * this.width + x] = new Tile(row, column, x, y, tileType);
                 }
-
-                this.tiles[y * this.width + x] = new Tile(row, column, x, y);
             }
+        }
+
+        private string GetTilesetTileType(TmxTileset tileset, int id)
+        {
+            TmxTilesetTile tilesetTile = TileForId(tileset, id);
+            
+            if (tilesetTile == null || ! tilesetTile.Properties.ContainsKey("type")) {
+                return null;
+            }
+
+            return tilesetTile.Properties["type"];
+        }
+
+        private TmxTilesetTile TileForId(TmxTileset tileset, int id)
+        {
+            // Terribly inefficient.. we could pretty easily optimize this if loading is too slow
+            foreach (TmxTilesetTile t in tileset.Tiles) {
+                if (t.Id == id) {
+                    return t;
+                }
+            }
+            return null;
         }
 
         public void Draw()
@@ -184,7 +217,7 @@ namespace Hugh {
             int playerX = (int)player.position.X;
             int playerY = (int)player.position.Y;
             var playerPositionRect = new Rectangle(playerX, playerY, Tile.SIZE, Tile.SIZE);
-            game.spriteBatch.Draw(tileset, playerPositionRect, player.TilesetRect, Color.White);
+            game.spriteBatch.Draw(tilesetTexture, playerPositionRect, player.TilesetRect, Color.White);
 
             game.spriteBatch.End();
         }
@@ -201,7 +234,7 @@ namespace Hugh {
                 }
 
                 var positionRect = new Rectangle((int)t.X, (int)t.Y, Tile.SIZE, Tile.SIZE);
-                game.spriteBatch.Draw(tileset, positionRect, t.TilesetRect, Color.White);
+                game.spriteBatch.Draw(tilesetTexture, positionRect, t.TilesetRect, Color.White);
             }
         }
 
@@ -248,6 +281,10 @@ namespace Hugh {
             Rectangle aabb = ComputeAabb(initialRect, finalRect);
 
             List<Tile> intersectingTiles = GetTilesWithinRect(aabb);
+
+            // TODO: instead of ignoring non-ground tiles, handle them appropriately!
+            intersectingTiles = intersectingTiles.FindAll((tile) => tile.IsGround());
+
             if (intersectingTiles.Count == 0)
             {
                 return false;
@@ -295,7 +332,10 @@ namespace Hugh {
         // TODO: make this work for an arbitrary dynamic object
         private bool IsVerticalCollision(Tile t)
         {
-            return Math.Abs(player.position.Y - t.Y) > Math.Abs(player.position.X - t.X);
+            /*
+             * FIXME: If you move and fall slowly over a corner tile, it counts as a wall collision
+             */
+            return Math.Abs(player.position.Y - t.Y) >= Math.Abs(player.position.X - t.X);
         }
 
         private List<Tile> GetTilesWithinRect(Rectangle r)
