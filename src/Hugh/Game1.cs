@@ -30,6 +30,117 @@ namespace Hugh {
         }
     }
 
+    class Tile {
+        // By design, all tiles are 32x32 px
+        public const int SIZE = 32;
+
+        private int row;
+        private int column;
+
+        // The rectangle of tileset to render for this tile
+        public Rectangle TilesetRect {
+            get { return new Rectangle(SIZE * column, SIZE * row, SIZE, SIZE); }
+        }
+
+        public Tile(int row, int column) {
+            this.row = row;
+            this.column = column;
+        }
+    }
+
+    class World
+    {
+        /*
+         * Note:
+         * This should stay be a per-world property, since we can
+         * potentiallly have different tileset for each world.
+         */
+        private Texture2D tileset;
+
+        // The interactive tile layer (the only layer for now)
+        private Tile[] tiles;
+        private int width;
+        private int height;
+
+        private Game1 game;
+
+        public int Width
+        {
+            get { return this.width; }
+        }
+
+        public int Height
+        {
+            get { return this.height; }
+        }
+
+        public World(Game1 game, TmxMap map, int worldId)
+        {
+            this.game = game;
+            this.width = map.Width;
+            this.height = map.Height;
+            this.tiles = new Tile[this.width * this.height];
+            this.tileset = game.Content.Load<Texture2D>(map.Tilesets[0].Name.ToString());
+
+            // TODO select the layer properly via the worldId
+
+            // Interactive layer
+            addTilesFromLayer(map.Layers[0]);
+            // World spceific layer
+            addTilesFromLayer(map.Layers[worldId]);
+        }
+
+        private void addTilesFromLayer(TmxLayer layer)
+        {
+            for (var i = 0; i < layer.Tiles.Count; i++)
+            {
+                int gid = layer.Tiles[i].Gid;
+
+                // Empty tile, do nothing
+                if (gid == 0)
+                {
+                    continue;
+                }
+
+                int tilesetTilesWidth = this.tileset.Width / Tile.SIZE;
+
+                int tileFrame = gid - 1;
+                int column = tileFrame % tilesetTilesWidth;
+                int row = tileFrame / tilesetTilesWidth;
+
+                int x = i % this.width;
+                int y = i / this.width;
+
+                this.tiles[y * this.width + x] = new Tile(row, column);
+            }
+        }
+
+        public void Draw()
+        {
+            game.spriteBatch.Begin();
+
+            for (int i = 0; i < this.width * this.height; i++)
+            {
+                Tile tile = this.tiles[i];
+
+                if (tile == null) {
+                    continue;
+                }
+
+                int xIndex = i % this.width;
+                int yIndex = i / this.width;
+
+                int x = xIndex * Tile.SIZE;
+                int y = yIndex * Tile.SIZE;
+
+                var positionRec = new Rectangle((int)x, (int)y, Tile.SIZE, Tile.SIZE);
+                game.spriteBatch.Draw(tileset, positionRec, tile.TilesetRect, Color.White);
+            }
+
+            game.spriteBatch.End();
+        }
+    }
+
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -38,13 +149,7 @@ namespace Hugh {
 
         public SpriteBatch spriteBatch;
 
-        TmxMap map;
-        Texture2D tileset;
-
-        int tileWidth;
-        int tileHeight;
-        int tilesetTilesWide;
-        int tilesetTilesHigh;
+        World world1, world2;
         
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
@@ -69,18 +174,13 @@ namespace Hugh {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            map = new TmxMap("Content/level1.tmx");
+            TmxMap map = new TmxMap("Content/level1.tmx");
 
-            tileset = Content.Load<Texture2D>(map.Tilesets[0].Name.ToString());
+            world1 = new World(this, map, 1);
+            world2 = new World(this, map, 2);
 
-            tileWidth = map.Tilesets[0].TileWidth;
-            tileHeight = map.Tilesets[0].TileHeight;
-
-            tilesetTilesWide = tileset.Width / tileWidth;
-            tilesetTilesHigh = tileset.Height / tileHeight;
-
-            graphics.PreferredBackBufferHeight = map.Height * tileHeight * 2;
-            graphics.PreferredBackBufferWidth = map.Width * tileWidth;
+            graphics.PreferredBackBufferHeight = world1.Height * Tile.SIZE * 2;
+            graphics.PreferredBackBufferWidth = world1.Width * Tile.SIZE;
             graphics.ApplyChanges();
         }
 
@@ -112,45 +212,11 @@ namespace Hugh {
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.White);
 
-            spriteBatch.Begin();
-
-            RenderLayer(map.Layers[0], Vector2.Zero);
-            RenderLayer(map.Layers[1], Vector2.Zero);
-
-            int mapHeight = map.TileHeight * map.Height;
-
-            RenderLayer(map.Layers[0], new Vector2(0, mapHeight));
-            RenderLayer(map.Layers[2], new Vector2(0, mapHeight));
-
-            spriteBatch.End();
+            // TODO: Draw them in different ViewPorts (in different parts of the screen)
+            world1.Draw();
+            //world2.Draw();
 
             base.Draw(gameTime);
-        }
-
-        protected void RenderLayer(TmxLayer layer, Vector2 offset)
-        {
-            for (var i = 0; i < layer.Tiles.Count; i++)
-            {
-                int gid = layer.Tiles[i].Gid;
-
-                // Empty tile, do nothing
-                if (gid == 0)
-                {
-                    continue;
-                }
-
-                int tileFrame = gid - 1;
-                int column = tileFrame % tilesetTilesWide;
-                int row = (int)Math.Floor((double)tileFrame / (double)tilesetTilesWide);
-
-                float x = (i % map.Width) * map.TileWidth + offset.X;
-                float y = (float)Math.Floor(i / (double)map.Width) * map.TileHeight + offset.Y;
-
-                var tilesetRec = new Rectangle(tileWidth * column, tileHeight * row, tileWidth, tileHeight);
-                var positionRec = new Rectangle((int)x, (int)y, tileWidth, tileHeight);
-
-                spriteBatch.Draw(tileset, positionRec, tilesetRec, Color.White);
-            }
         }
     }
 }
