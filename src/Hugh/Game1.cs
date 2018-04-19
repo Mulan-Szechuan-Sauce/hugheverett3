@@ -458,6 +458,10 @@ namespace Hugh {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            // Restart
+            if (Keyboard.GetState().IsKeyDown(Keys.R))
+                LoadContent();
+
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
             world1.Update(dt);
             world2.Update(dt);
