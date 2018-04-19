@@ -82,12 +82,18 @@ namespace Hugh {
             this.tiles = new Tile[this.width * this.height];
             this.tileset = game.Content.Load<Texture2D>(map.Tilesets[0].Name.ToString());
 
-            // TODO select the layer properly via the worldId and the layer name.
+            addTilesFromLayer(findLayer(map, "universal"));
+            addTilesFromLayer(findLayer(map, string.Format("world{0}", worldId)));
+        }
 
-            // Interactive layer
-            addTilesFromLayer(map.Layers[0]);
-            // World spceific layer
-            addTilesFromLayer(map.Layers[worldId]);
+        private TmxLayer findLayer(TmxMap map, string name) {
+            foreach (TmxLayer layer in map.Layers) {
+                if (layer.Name == name) {
+                    return layer;
+                }
+            }
+            // Suck it up buttercup
+            return null;
         }
 
         private void addTilesFromLayer(TmxLayer layer)
