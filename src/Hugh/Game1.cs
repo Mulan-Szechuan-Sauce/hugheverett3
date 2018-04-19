@@ -82,7 +82,7 @@ namespace Hugh {
             this.tiles = new Tile[this.width * this.height];
             this.tileset = game.Content.Load<Texture2D>(map.Tilesets[0].Name.ToString());
 
-            // TODO select the layer properly via the worldId
+            // TODO select the layer properly via the worldId and the layer name.
 
             // Interactive layer
             addTilesFromLayer(map.Layers[0]);
@@ -133,11 +133,15 @@ namespace Hugh {
                 int x = xIndex * Tile.SIZE;
                 int y = yIndex * Tile.SIZE;
 
-                var positionRec = new Rectangle((int)x, (int)y, Tile.SIZE, Tile.SIZE);
-                game.spriteBatch.Draw(tileset, positionRec, tile.TilesetRect, Color.White);
+                var positionRect = new Rectangle((int)x, (int)y, Tile.SIZE, Tile.SIZE);
+                game.spriteBatch.Draw(tileset, positionRect, tile.TilesetRect, Color.White);
             }
 
             game.spriteBatch.End();
+        }
+
+        public void Update(float dt) {
+            // TODO fizix 'n' other fun stuff
         }
     }
 
@@ -149,6 +153,7 @@ namespace Hugh {
 
         public SpriteBatch spriteBatch;
 
+        Viewport viewportTop, viewportBottom, viewportMain;
         World world1, world2;
         
         public Game1() {
@@ -182,6 +187,15 @@ namespace Hugh {
             graphics.PreferredBackBufferHeight = world1.Height * Tile.SIZE * 2;
             graphics.PreferredBackBufferWidth = world1.Width * Tile.SIZE;
             graphics.ApplyChanges();
+
+            viewportMain = GraphicsDevice.Viewport;
+
+            viewportTop = viewportMain;
+            viewportTop.Height = viewportTop.Height / 2;
+
+            viewportBottom = viewportMain;
+            viewportBottom.Height = viewportBottom.Height / 2;
+            viewportBottom.Y = viewportBottom.Height;
         }
 
         /// <summary>
@@ -202,6 +216,8 @@ namespace Hugh {
                 Exit();
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            world1.Update(dt);
+            world2.Update(dt);
             base.Update(gameTime);
         }
 
@@ -212,9 +228,11 @@ namespace Hugh {
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.White);
 
-            // TODO: Draw them in different ViewPorts (in different parts of the screen)
+            GraphicsDevice.Viewport = viewportTop;
             world1.Draw();
-            //world2.Draw();
+            GraphicsDevice.Viewport = viewportBottom;
+            world2.Draw();
+            GraphicsDevice.Viewport = viewportMain;
 
             base.Draw(gameTime);
         }
