@@ -85,6 +85,8 @@ namespace Hugh {
         private int row;
         private int column;
 
+        public bool IsOnFloor { get; set; }
+
         // The rectangle of tileset to render for this tile
         public Rectangle TilesetRect {
             get { return new Rectangle(SIZE * column, SIZE * row, SIZE, SIZE); }
@@ -252,19 +254,31 @@ namespace Hugh {
                 player.velocity.X += 3 * dt;
             }
 
+            if (player.IsOnFloor && !Controller.isRightPressed() && !Controller.isLeftPressed())
+            {
+                const float FRICTION = 7f;
+
+                if (player.velocity.X > 0) {
+                    player.velocity.X = Math.Max(0, player.velocity.X - FRICTION * dt);
+                } else if (player.velocity.X < 0) {
+                    player.velocity.X = Math.Min(0, player.velocity.X + FRICTION * dt);
+                }
+            }
+
             const float GRAVITY = 9.8f; 
 
-            // Weird jumping functionality for testing - It should only jump if grounded
-            if (Controller.isUpPressed())
+            if (Controller.isUpPressed() && player.IsOnFloor)
             {
-                player.velocity.Y -= GRAVITY * dt;
-                player.velocity.Y -= 5 * dt;
+                player.velocity.Y = - 7f;
             }
 
             // Gravity.
             player.velocity.Y += GRAVITY * dt;
 
-            while (HandleCollisions())
+            // May be set in HandleFloorCollisions
+            player.IsOnFloor = false;
+
+            while (HandleFloorCollisions())
             {
             }
 
@@ -272,7 +286,7 @@ namespace Hugh {
             player.position.Y += player.velocity.Y;
         }
 
-        private bool HandleCollisions()
+        private bool HandleFloorCollisions()
         {
             // Note: If collisions are handled properly, initialRect should never overlap
             Rectangle initialRect = ComputeEntityRect(player.position);
@@ -308,6 +322,7 @@ namespace Hugh {
                     // Floor hit
                     player.position.Y = (float)Math.Floor(t.Y - Tile.SIZE);
                     player.velocity.Y = 0;
+                    player.IsOnFloor = true;
                 } else {
                     // Ceiling hit
                     player.position.Y = (float)Math.Ceiling(t.Y + Tile.SIZE);
