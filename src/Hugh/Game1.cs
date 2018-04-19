@@ -8,29 +8,36 @@ using System.Collections.Generic;
 using TiledSharp;
 
 namespace Hugh {
-    class Controller {
-        private static bool IsKeyDown(Keys key) {
+    class Controller
+    {
+        private static bool IsKeyDown(Keys key)
+        {
             return Keyboard.GetState().IsKeyDown(key);
         }
 
-        public static bool isLeftPressed() {
+        public static bool isLeftPressed()
+        {
             return IsKeyDown(Keys.Left) || IsKeyDown(Keys.A);
         }
 
-        public static bool isRightPressed() {
+        public static bool isRightPressed()
+        {
             return IsKeyDown(Keys.Right) || IsKeyDown(Keys.E);
         }
 
-        public static bool isUpPressed() {
+        public static bool isUpPressed()
+        {
             return IsKeyDown(Keys.Up) || IsKeyDown(Keys.OemComma);
         }
 
-        public static bool isDownPressed() {
+        public static bool isDownPressed()
+        {
             return IsKeyDown(Keys.Down) || IsKeyDown(Keys.O);
         }
     }
 
-    class Tile {
+    class Tile
+    {
         // By design, all tiles are 32x32 px
         public const int SIZE = 32;
 
@@ -40,6 +47,8 @@ namespace Hugh {
         private int x;
         private int y;
 
+        private string type;
+
         // The rectangle of tileset to render for this tile
         public Rectangle TilesetRect {
             get { return new Rectangle(SIZE * column, SIZE * row, SIZE, SIZE); }
@@ -48,11 +57,18 @@ namespace Hugh {
         public float X {get { return (float)this.x * SIZE; }}
         public float Y {get { return (float)this.y * SIZE; }}
 
-        public Tile(int row, int column, int x, int y) {
+        public Tile(int row, int column, int x, int y, string type)
+        {
             this.row = row;
             this.column = column;
             this.x = x;
             this.y = y;
+            this.type = type;
+        }
+
+        public bool IsGround()
+        {
+            return "ground".Equals(this.type);
         }
     }
 
@@ -74,7 +90,8 @@ namespace Hugh {
             get { return new Rectangle(SIZE * column, SIZE * row, SIZE, SIZE); }
         }
 
-        public Player(int row, int column, Vector2 position) {
+        public Player(int row, int column, Vector2 position)
+        {
             this.row = row;
             this.column = column;
             this.position = position;
@@ -88,7 +105,7 @@ namespace Hugh {
          * This should stay be a per-world property, since we can
          * potentiallly have different tileset for each world.
          */
-        private Texture2D tileset;
+        private Texture2D tilesetTexture;
 
         // The interactive tile layer (the only layer for now)
         private Player player;
@@ -114,15 +131,20 @@ namespace Hugh {
             this.width = map.Width;
             this.height = map.Height;
             this.tiles = new Tile[this.width * this.height];
-            this.tileset = game.Content.Load<Texture2D>(map.Tilesets[0].Name.ToString());
 
-            addTilesFromLayer(findLayer(map, "universal"));
-            addTilesFromLayer(findLayer(map, string.Format("world{0}", worldId)));
+            var tileset = map.Tilesets[0];
+            this.tilesetTexture = game.Content.Load<Texture2D>(tileset.Name.ToString());
+
+            AddTilesFromLayer(findLayer(map, "universal"), tileset);
+            AddTilesFromLayer(findLayer(map, string.Format("world{0}", worldId)), tileset);
         }
 
-        private TmxLayer findLayer(TmxMap map, string name) {
-            foreach (TmxLayer layer in map.Layers) {
-                if (name.Equals(layer.Name)) {
+        private TmxLayer findLayer(TmxMap map, string name)
+        {
+            foreach (TmxLayer layer in map.Layers)
+            {
+                if (name.Equals(layer.Name))
+                {
                     return layer;
                 }
             }
@@ -130,7 +152,7 @@ namespace Hugh {
             return null;
         }
 
-        private void addTilesFromLayer(TmxLayer layer)
+        private void AddTilesFromLayer(TmxLayer layer, TmxTileset tileset)
         {
             for (var i = 0; i < layer.Tiles.Count; i++)
             {
@@ -143,7 +165,7 @@ namespace Hugh {
                     continue;
                 }
 
-                int tilesetTilesWidth = this.tileset.Width / Tile.SIZE;
+                int tilesetTilesWidth = this.tilesetTexture.Width / Tile.SIZE;
 
                 int tileFrame = gid - 1;
                 int column = tileFrame % tilesetTilesWidth;
@@ -152,29 +174,39 @@ namespace Hugh {
                 int x = i % this.width;
                 int y = i / this.width;
 
-                // FIXME this should check a Tiled property (I think the "Type" property)
-                if (tileFrame == 5) {
+                string tileType = GetTilesetTileType(tileset, tileFrame);
+
+                if ("player".Equals(tileType))
+                {
                     player = new Player(row, column, new Vector2(x * Tile.SIZE, y * Tile.SIZE));
                     continue;
+                } else {
+                    this.tiles[y * this.width + x] = new Tile(row, column, x, y, tileType);
                 }
-
-                this.tiles[y * this.width + x] = new Tile(row, column, x, y);
             }
         }
 
-        /*
-        public void Draw()
+        private string GetTilesetTileType(TmxTileset tileset, int id)
         {
-            game.spriteBatch.Begin();
+            TmxTilesetTile tilesetTile = TileForId(tileset, id);
+            
+            if (tilesetTile == null || ! tilesetTile.Properties.ContainsKey("type")) {
+                return null;
+            }
 
+            return tilesetTile.Properties["type"];
+        }
 
-            int playerX = (int)player.position.X;
-            int playerY = (int)player.position.Y;
-            var playerPositionRect = new Rectangle(playerX, playerY, Tile.SIZE, Tile.SIZE);
-            game.spriteBatch.Draw(tileset, playerPositionRect, player.TilesetRect, Color.White);
-
-            game.spriteBatch.End();
-        }*/
+        private TmxTilesetTile TileForId(TmxTileset tileset, int id)
+        {
+            // Terribly inefficient.. we could pretty easily optimize this if loading is too slow
+            foreach (TmxTilesetTile t in tileset.Tiles) {
+                if (t.Id == id) {
+                    return t;
+                }
+            }
+            return null;
+        }
 
         public void Draw()
         {
@@ -185,7 +217,7 @@ namespace Hugh {
             int playerX = (int)player.position.X;
             int playerY = (int)player.position.Y;
             var playerPositionRect = new Rectangle(playerX, playerY, Tile.SIZE, Tile.SIZE);
-            game.spriteBatch.Draw(tileset, playerPositionRect, player.TilesetRect, Color.White);
+            game.spriteBatch.Draw(tilesetTexture, playerPositionRect, player.TilesetRect, Color.White);
 
             game.spriteBatch.End();
         }
@@ -196,30 +228,35 @@ namespace Hugh {
             {
                 Tile t = this.tiles[i];
 
-                if (t == null) {
+                if (t == null)
+                {
                     continue;
                 }
 
                 var positionRect = new Rectangle((int)t.X, (int)t.Y, Tile.SIZE, Tile.SIZE);
-                game.spriteBatch.Draw(tileset, positionRect, t.TilesetRect, Color.White);
+                game.spriteBatch.Draw(tilesetTexture, positionRect, t.TilesetRect, Color.White);
             }
         }
 
-        public void Update(float dt) {
+        public void Update(float dt)
+        {
             // TODO Refactor out the player controls and logic into the Player class
 
-            if (Controller.isLeftPressed()) {
+            if (Controller.isLeftPressed())
+            {
                 player.velocity.X -= 3 * dt;
             }
 
-            if (Controller.isRightPressed()) {
+            if (Controller.isRightPressed())
+            {
                 player.velocity.X += 3 * dt;
             }
 
             const float GRAVITY = 9.8f; 
 
             // Weird jumping functionality for testing - It should only jump if grounded
-            if (Controller.isUpPressed()) {
+            if (Controller.isUpPressed())
+            {
                 player.velocity.Y -= GRAVITY * dt;
                 player.velocity.Y -= 5 * dt;
             }
@@ -227,14 +264,16 @@ namespace Hugh {
             // Gravity.
             player.velocity.Y += GRAVITY * dt;
 
-            while (HandleCollisions()) {
+            while (HandleCollisions())
+            {
             }
 
             player.position.X += player.velocity.X;
             player.position.Y += player.velocity.Y;
         }
 
-        private bool HandleCollisions() {
+        private bool HandleCollisions()
+        {
             // Note: If collisions are handled properly, initialRect should never overlap
             Rectangle initialRect = ComputeEntityRect(player.position);
             Rectangle finalRect   = ComputeEntityRect(player.position + player.velocity);
@@ -242,7 +281,12 @@ namespace Hugh {
             Rectangle aabb = ComputeAabb(initialRect, finalRect);
 
             List<Tile> intersectingTiles = GetTilesWithinRect(aabb);
-            if (intersectingTiles.Count == 0) {
+
+            // TODO: instead of ignoring non-ground tiles, handle them appropriately!
+            intersectingTiles = intersectingTiles.FindAll((tile) => tile.IsGround());
+
+            if (intersectingTiles.Count == 0)
+            {
                 return false;
             }
 
@@ -257,8 +301,10 @@ namespace Hugh {
 
             Tile t = intersectingTiles[0];
 
-            if (IsVerticalCollision(t)) {
-                if (initialRect.Y < t.Y) {
+            if (IsVerticalCollision(t))
+            {
+                if (initialRect.Y < t.Y)
+                {
                     // Floor hit
                     player.position.Y = (float)Math.Floor(t.Y - Tile.SIZE);
                     player.velocity.Y = 0;
@@ -268,7 +314,8 @@ namespace Hugh {
                     player.velocity.Y = 0;
                 }
             } else {
-                if (initialRect.X < t.X) {
+                if (initialRect.X < t.X)
+                {
                     // Right hit
                     player.position.X = (float)Math.Floor(t.X - Tile.SIZE);
                     player.velocity.X = 0;
@@ -285,10 +332,14 @@ namespace Hugh {
         // TODO: make this work for an arbitrary dynamic object
         private bool IsVerticalCollision(Tile t)
         {
-            return Math.Abs(player.position.Y - t.Y) > Math.Abs(player.position.X - t.X);
+            /*
+             * FIXME: If you move and fall slowly over a corner tile, it counts as a wall collision
+             */
+            return Math.Abs(player.position.Y - t.Y) >= Math.Abs(player.position.X - t.X);
         }
 
-        private List<Tile> GetTilesWithinRect(Rectangle r) {
+        private List<Tile> GetTilesWithinRect(Rectangle r)
+        {
             List<Tile> tiles = new List<Tile>();
             
             int x1 = (int)Math.Floor((float)r.X / Tile.SIZE);
@@ -296,14 +347,18 @@ namespace Hugh {
             int y1 = (int)Math.Floor((float)r.Y / Tile.SIZE);
             int y2 = (int)Math.Ceiling((float)(r.Y + r.Height) / Tile.SIZE);
             
-            for (int x = x1; x < x2; x++) {
-                for (int y = y1; y < y2; y++) {
-                    if (x >= this.width || x < 0 || y >= this.height || y < 0) {
+            for (int x = x1; x < x2; x++)
+            {
+                for (int y = y1; y < y2; y++)
+                {
+                    if (x >= this.width || x < 0 || y >= this.height || y < 0)
+                    {
                         continue;
                     }
 
                     Tile tile = this.tiles[y * this.width + x];
-                    if (tile != null) {
+                    if (tile != null)
+                    {
                         tiles.Add(tile);
                     }
                 }
@@ -312,7 +367,8 @@ namespace Hugh {
             return tiles;
         }
 
-        private static Rectangle ComputeAabb(Rectangle a, Rectangle b) {
+        private static Rectangle ComputeAabb(Rectangle a, Rectangle b)
+        {
             int x = Math.Min(a.X, b.X);
             int y = Math.Min(a.Y, b.Y);
             int width = Math.Max(a.X + a.Width, b.X + b.Width) - x;
@@ -321,7 +377,8 @@ namespace Hugh {
             return new Rectangle(x, y, width, height);
         }
 
-        private static Rectangle ComputeEntityRect(Vector2 position) {
+        private static Rectangle ComputeEntityRect(Vector2 position)
+        {
             return new Rectangle((int)position.X, (int)position.Y, Tile.SIZE, Tile.SIZE);
         }
     }
@@ -337,7 +394,8 @@ namespace Hugh {
         Viewport viewportTop, viewportBottom, viewportMain;
         World world1, world2;
         
-        public Game1() {
+        public Game1()
+        {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
@@ -348,7 +406,8 @@ namespace Hugh {
         /// related content.  Calling base.Initialize will enumerate through any components
         /// and initialize them as well.
         /// </summary>
-        protected override void Initialize() {
+        protected override void Initialize()
+        {
             base.Initialize();
         }
 
@@ -356,7 +415,8 @@ namespace Hugh {
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
         /// </summary>
-        protected override void LoadContent() {
+        protected override void LoadContent()
+        {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -383,7 +443,8 @@ namespace Hugh {
         /// UnloadContent will be called once per game and is the place to unload
         /// game-specific content.
         /// </summary>
-        protected override void UnloadContent() {
+        protected override void UnloadContent()
+        {
             // TODO: Unload any non ContentManager content here
         }
 
@@ -392,9 +453,14 @@ namespace Hugh {
         /// checking for collisions, gathering input, and playing audio.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Update(GameTime gameTime) {
+        protected override void Update(GameTime gameTime)
+        {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            // Restart
+            if (Keyboard.GetState().IsKeyDown(Keys.R))
+                LoadContent();
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
             world1.Update(dt);
@@ -406,7 +472,8 @@ namespace Hugh {
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Draw(GameTime gameTime) {
+        protected override void Draw(GameTime gameTime)
+        {
             GraphicsDevice.Clear(Color.White);
 
             GraphicsDevice.Viewport = viewportTop;
