@@ -332,10 +332,8 @@ namespace Hugh {
         // TODO: make this work for an arbitrary dynamic object
         private bool IsVerticalCollision(Tile t)
         {
-            /*
-             * FIXME: If you move and fall slowly over a corner tile, it counts as a wall collision
-             */
-            return Math.Abs(player.position.Y - t.Y) >= Math.Abs(player.position.X - t.X);
+            // Comparing floats caused issues with corners
+            return (int)Math.Abs(player.position.Y - t.Y) >= (int)Math.Abs(player.position.X - t.X);
         }
 
         private List<Tile> GetTilesWithinRect(Rectangle r)
