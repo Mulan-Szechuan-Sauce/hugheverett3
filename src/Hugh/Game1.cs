@@ -37,14 +37,47 @@ namespace Hugh {
         private int row;
         private int column;
 
+        private int x;
+        private int y;
+
         // The rectangle of tileset to render for this tile
         public Rectangle TilesetRect {
             get { return new Rectangle(SIZE * column, SIZE * row, SIZE, SIZE); }
         }
 
-        public Tile(int row, int column) {
+        public float X {get { return (float)this.x * SIZE; }}
+        public float Y {get { return (float)this.y * SIZE; }}
+
+        public Tile(int row, int column, int x, int y) {
             this.row = row;
             this.column = column;
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    /*
+     * TODO: In the future (post-prototype), dynamic objects should be in
+     * their own tileset, and be allowed to differ in size.
+     */
+    class Player {
+        // By design, the player is 32x32 px (for now?)
+        private const int SIZE = 32;
+
+        public Vector2 position;
+        public Vector2 velocity;
+        private int row;
+        private int column;
+
+        // The rectangle of tileset to render for this tile
+        public Rectangle TilesetRect {
+            get { return new Rectangle(SIZE * column, SIZE * row, SIZE, SIZE); }
+        }
+
+        public Player(int row, int column, Vector2 position) {
+            this.row = row;
+            this.column = column;
+            this.position = position;
         }
     }
 
@@ -58,6 +91,7 @@ namespace Hugh {
         private Texture2D tileset;
 
         // The interactive tile layer (the only layer for now)
+        private Player player;
         private Tile[] tiles;
         private int width;
         private int height;
@@ -88,7 +122,7 @@ namespace Hugh {
 
         private TmxLayer findLayer(TmxMap map, string name) {
             foreach (TmxLayer layer in map.Layers) {
-                if (layer.Name == name) {
+                if (name.Equals(layer.Name)) {
                     return layer;
                 }
             }
@@ -100,7 +134,8 @@ namespace Hugh {
         {
             for (var i = 0; i < layer.Tiles.Count; i++)
             {
-                int gid = layer.Tiles[i].Gid;
+                TmxLayerTile tile = layer.Tiles[i];
+                int gid = tile.Gid;
 
                 // Empty tile, do nothing
                 if (gid == 0)
@@ -117,37 +152,177 @@ namespace Hugh {
                 int x = i % this.width;
                 int y = i / this.width;
 
-                this.tiles[y * this.width + x] = new Tile(row, column);
+                // FIXME this should check a Tiled property (I think the "Type" property)
+                if (tileFrame == 5) {
+                    player = new Player(row, column, new Vector2(x * Tile.SIZE, y * Tile.SIZE));
+                    continue;
+                }
+
+                this.tiles[y * this.width + x] = new Tile(row, column, x, y);
             }
         }
+
+        /*
+        public void Draw()
+        {
+            game.spriteBatch.Begin();
+
+
+            int playerX = (int)player.position.X;
+            int playerY = (int)player.position.Y;
+            var playerPositionRect = new Rectangle(playerX, playerY, Tile.SIZE, Tile.SIZE);
+            game.spriteBatch.Draw(tileset, playerPositionRect, player.TilesetRect, Color.White);
+
+            game.spriteBatch.End();
+        }*/
 
         public void Draw()
         {
             game.spriteBatch.Begin();
 
-            for (int i = 0; i < this.width * this.height; i++)
-            {
-                Tile tile = this.tiles[i];
+            DrawTiles();
 
-                if (tile == null) {
-                    continue;
-                }
-
-                int xIndex = i % this.width;
-                int yIndex = i / this.width;
-
-                int x = xIndex * Tile.SIZE;
-                int y = yIndex * Tile.SIZE;
-
-                var positionRect = new Rectangle((int)x, (int)y, Tile.SIZE, Tile.SIZE);
-                game.spriteBatch.Draw(tileset, positionRect, tile.TilesetRect, Color.White);
-            }
+            int playerX = (int)player.position.X;
+            int playerY = (int)player.position.Y;
+            var playerPositionRect = new Rectangle(playerX, playerY, Tile.SIZE, Tile.SIZE);
+            game.spriteBatch.Draw(tileset, playerPositionRect, player.TilesetRect, Color.White);
 
             game.spriteBatch.End();
         }
 
+        private void DrawTiles()
+        {
+            for (int i = 0; i < this.width * this.height; i++)
+            {
+                Tile t = this.tiles[i];
+
+                if (t == null) {
+                    continue;
+                }
+
+                var positionRect = new Rectangle((int)t.X, (int)t.Y, Tile.SIZE, Tile.SIZE);
+                game.spriteBatch.Draw(tileset, positionRect, t.TilesetRect, Color.White);
+            }
+        }
+
         public void Update(float dt) {
-            // TODO fizix 'n' other fun stuff
+            // TODO Refactor out the player controls and logic into the Player class
+
+            if (Controller.isLeftPressed()) {
+                player.velocity.X -= 3 * dt;
+            }
+
+            if (Controller.isRightPressed()) {
+                player.velocity.X += 3 * dt;
+            }
+
+            const float GRAVITY = 9.8f; 
+
+            // Weird jumping functionality for testing - It should only jump if grounded
+            if (Controller.isUpPressed()) {
+                player.velocity.Y -= GRAVITY * dt;
+                player.velocity.Y -= 5 * dt;
+            }
+
+            // Gravity.
+            player.velocity.Y += GRAVITY * dt;
+
+            while (HandleCollisions()) {
+            }
+
+            player.position.X += player.velocity.X;
+            player.position.Y += player.velocity.Y;
+        }
+
+        private bool HandleCollisions() {
+            // Note: If collisions are handled properly, initialRect should never overlap
+            Rectangle initialRect = ComputeEntityRect(player.position);
+            Rectangle finalRect   = ComputeEntityRect(player.position + player.velocity);
+
+            Rectangle aabb = ComputeAabb(initialRect, finalRect);
+
+            List<Tile> intersectingTiles = GetTilesWithinRect(aabb);
+            if (intersectingTiles.Count == 0) {
+                return false;
+            }
+
+            // TODO: Just get the minimum manhattan distance, don't bother sorting
+            intersectingTiles.Sort((a, b) => {
+                    // Sort by manhattan distance (faster than euclidean, and "good enough")
+                    float distA = Math.Abs(a.X - player.position.X) + Math.Abs(a.Y - player.position.Y);
+                    float distB = Math.Abs(b.X - player.position.X) + Math.Abs(b.Y - player.position.Y);
+
+                    return (distA > distB) ? 1 : -1;
+                });
+
+            Tile t = intersectingTiles[0];
+
+            if (IsVerticalCollision(t)) {
+                if (initialRect.Y < t.Y) {
+                    // Floor hit
+                    player.position.Y = (float)Math.Floor(t.Y - Tile.SIZE);
+                    player.velocity.Y = 0;
+                } else {
+                    // Ceiling hit
+                    player.position.Y = (float)Math.Ceiling(t.Y + Tile.SIZE);
+                    player.velocity.Y = 0;
+                }
+            } else {
+                if (initialRect.X < t.X) {
+                    // Right hit
+                    player.position.X = (float)Math.Floor(t.X - Tile.SIZE);
+                    player.velocity.X = 0;
+                } else {
+                    // Left hit
+                    player.position.X = (float)Math.Ceiling(t.X + Tile.SIZE);
+                    player.velocity.X = 0;
+                }
+            }
+
+            return true;
+        }
+
+        // TODO: make this work for an arbitrary dynamic object
+        private bool IsVerticalCollision(Tile t)
+        {
+            return Math.Abs(player.position.Y - t.Y) > Math.Abs(player.position.X - t.X);
+        }
+
+        private List<Tile> GetTilesWithinRect(Rectangle r) {
+            List<Tile> tiles = new List<Tile>();
+            
+            int x1 = (int)Math.Floor((float)r.X / Tile.SIZE);
+            int x2 = (int)Math.Ceiling((float)(r.X + r.Width) / Tile.SIZE);
+            int y1 = (int)Math.Floor((float)r.Y / Tile.SIZE);
+            int y2 = (int)Math.Ceiling((float)(r.Y + r.Height) / Tile.SIZE);
+            
+            for (int x = x1; x < x2; x++) {
+                for (int y = y1; y < y2; y++) {
+                    if (x >= this.width || x < 0 || y >= this.height || y < 0) {
+                        continue;
+                    }
+
+                    Tile tile = this.tiles[y * this.width + x];
+                    if (tile != null) {
+                        tiles.Add(tile);
+                    }
+                }
+            }
+            
+            return tiles;
+        }
+
+        private static Rectangle ComputeAabb(Rectangle a, Rectangle b) {
+            int x = Math.Min(a.X, b.X);
+            int y = Math.Min(a.Y, b.Y);
+            int width = Math.Max(a.X + a.Width, b.X + b.Width) - x;
+            int height = Math.Max(a.Y + a.Height, b.Y + b.Height) - y;
+
+            return new Rectangle(x, y, width, height);
+        }
+
+        private static Rectangle ComputeEntityRect(Vector2 position) {
+            return new Rectangle((int)position.X, (int)position.Y, Tile.SIZE, Tile.SIZE);
         }
     }
 
