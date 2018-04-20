@@ -254,9 +254,9 @@ namespace Hugh {
                 player.velocity.X += 3 * dt;
             }
 
-            if (player.IsOnFloor && !Controller.isRightPressed() && !Controller.isLeftPressed())
+            if (!Controller.isRightPressed() && !Controller.isLeftPressed())
             {
-                const float FRICTION = 7f;
+                const float FRICTION = 8f;
 
                 if (player.velocity.X > 0) {
                     player.velocity.X = Math.Max(0, player.velocity.X - FRICTION * dt);
@@ -269,7 +269,7 @@ namespace Hugh {
 
             if (Controller.isUpPressed() && player.IsOnFloor)
             {
-                player.velocity.Y = - 7f;
+                player.velocity.Y = - 6f;
             }
 
             // Gravity.
