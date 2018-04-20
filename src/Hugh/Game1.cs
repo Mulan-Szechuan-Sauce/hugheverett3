@@ -437,11 +437,16 @@ namespace Hugh {
 
         Viewport viewportMain;
         World world1, world2;
+
+        Texture2D borderTexture;
+
+        string levelName;
         
-        public Game1()
+        public Game1(string levelName)
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            this.levelName = levelName;
         }
 
         /// <summary>
@@ -464,7 +469,7 @@ namespace Hugh {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            TmxMap map = new TmxMap("Content/level1.tmx");
+            TmxMap map = new TmxMap("Content/" + this.levelName + ".tmx");
 
             world1 = new World(this, map, 1);
             world2 = new World(this, map, 2);
@@ -486,6 +491,9 @@ namespace Hugh {
 
             world1.Viewport = viewportTop;
             world2.Viewport = viewportBottom;
+
+            borderTexture = new Texture2D(GraphicsDevice, 1, 1);
+            borderTexture.SetData(new[] { Color.Black });
         }
 
         /// <summary>
@@ -530,7 +538,11 @@ namespace Hugh {
 
             GraphicsDevice.Viewport = viewportMain;
 
-            // TODO draw a border between the world viewports
+            spriteBatch.Begin();
+            // Border between the universes
+            spriteBatch.Draw(borderTexture, new Rectangle(0, viewportMain.Height / 2 - 1, viewportMain.Width, 2),
+                             Color.Black);
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

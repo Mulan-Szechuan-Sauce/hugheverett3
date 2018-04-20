@@ -13,7 +13,8 @@ namespace Hugh
         [STAThread]
         static void Main()
         {
-            using (var game = new Game1())
+            string levelName = "level2";
+            using (var game = new Game1(levelName))
                 game.Run();
         }
     }
