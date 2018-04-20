@@ -188,10 +188,8 @@ namespace Hugh
 
         public void Update(float dt)
         {
+            player.IsOnFloor = IsPlayerOnFloor();
             player.Update(dt);
-
-            // May be set in HandleFloorCollisions
-            player.IsOnFloor = false;
 
             while (HandleFloorCollisions())
             {
@@ -199,6 +197,43 @@ namespace Hugh
 
             player.position.X += player.velocity.X;
             player.position.Y += player.velocity.Y;
+        }
+
+        // TODO: Move this to the player class, once the multiverse code is in place
+        private bool IsPlayerOnFloor()
+        {
+            int pixelX = (int)player.position.X;
+            int pixelY = (int)player.position.Y;
+
+            if (pixelY % Tile.SIZE != 0) {
+                return false;
+            }
+
+            int tileX = (int)player.position.X % Tile.SIZE;
+            // The Y coord below the player
+            int tileY = (int)player.position.Y % Tile.SIZE + 1;
+
+            if (tileY >= this.height) {
+                return false;
+            }
+
+            // TODO: Add a NullTile class, so you don't have to do annoying null checks like this
+
+            if (this.tiles[tileY * this.width + tileX] != null &&
+                this.tiles[tileY * this.width + tileX].IsGround()) {
+                return true;
+            }
+
+            if (pixelX % Tile.SIZE == 0 || tileX + 1 >= this.width) {
+                return false;
+            }
+
+            if (this.tiles[tileY * this.width + tileX + 1] != null &&
+                this.tiles[tileY * this.width + tileX + 1].IsGround()) {
+                return true;
+            }
+
+            return false;
         }
 
         private bool HandleFloorCollisions()
@@ -237,7 +272,6 @@ namespace Hugh
                     // Floor hit
                     player.position.Y = (float)Math.Floor(t.Y - Tile.SIZE);
                     player.velocity.Y = 0;
-                    player.IsOnFloor = true;
                 } else {
                     // Ceiling hit
                     player.position.Y = (float)Math.Ceiling(t.Y + Tile.SIZE);

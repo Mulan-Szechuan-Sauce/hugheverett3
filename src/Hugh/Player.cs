@@ -17,6 +17,8 @@ namespace Hugh {
         private int row;
         private int column;
 
+        private bool upWasPressed;
+
         public bool IsOnFloor { get; set; }
 
         // The rectangle of tileset to render for this tile
@@ -58,10 +60,12 @@ namespace Hugh {
                 }
             }
 
-            if (Controller.isUpPressed() && this.IsOnFloor)
+            if (!upWasPressed && Controller.isUpPressed() && this.IsOnFloor)
             {
                 velocity.Y = - JUMP_VEL;
             }
+
+            upWasPressed = Controller.isUpPressed();
 
             // Gravity.
             velocity.Y += GRAVITY * dt;
