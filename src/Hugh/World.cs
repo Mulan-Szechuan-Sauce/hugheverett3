@@ -188,32 +188,7 @@ namespace Hugh
 
         public void Update(float dt)
         {
-            // TODO Refactor out the player controls and logic into the Player class
-
-            if (Controller.isLeftPressed() && !Controller.isRightPressed())
-            {
-                player.velocity.X -= 3 * dt;
-            } else if (Controller.isRightPressed() && !Controller.isLeftPressed()) {
-                player.velocity.X += 3 * dt;
-            } else {
-                const float FRICTION = 8f;
-
-                if (player.velocity.X > 0) {
-                    player.velocity.X = Math.Max(0, player.velocity.X - FRICTION * dt);
-                } else if (player.velocity.X < 0) {
-                    player.velocity.X = Math.Min(0, player.velocity.X + FRICTION * dt);
-                }
-            }
-
-            const float GRAVITY = 9.8f; 
-
-            if (Controller.isUpPressed() && player.IsOnFloor)
-            {
-                player.velocity.Y = - 6f;
-            }
-
-            // Gravity.
-            player.velocity.Y += GRAVITY * dt;
+            player.Update(dt);
 
             // May be set in HandleFloorCollisions
             player.IsOnFloor = false;
