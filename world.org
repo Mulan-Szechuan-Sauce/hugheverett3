@@ -1,16 +1,74 @@
+*WARNING: This contains SPOILERS*
+
 * Gameplay
 
-  It would be cool to have a passive storyline - for instance, if you want to, you could stop and listen to what people are talking about, or you could sneak past them / kill them / whatever
+  It would be cool to have a passive storyline - for instance, if you want to, you could stop and listen to what people are talking about, or you could sneak past them / kill them / whatever. At the end of each Act, there could be cutscenes for critical storyline points.
 
-  Every character must arrive at the end goal simultaneously.
+  Every Hugh must arrive at the end goal simultaneously.
 
-* World Building
-  
-  I kind of want to make the game start on a happy note, maybe an outdoors theme. But then it gets darker / more messed up.
+* Artwork
+
+  In Act 1, every universe has the same tileset. However, the tileset in each universe will start diverging, starting with Act 2.
 
 * Plot
+** Act 1
 
-  Something something sci fi something something magic? something something fantasy? Any sufficiently advanced technology is indistinguishable from magic.
+  - Player finds/invents/discovers a device that allows him to experience multiple parallel universes simultaneously.
+  - Continues solving puzzles, the world is hunky dory.
+  - Accidentally opens a wormhole and let's a crazy creature through
+ 
+** Act 2
+
+  - To continue solving puzzles and improve the device, he has to kill bystanders occasionally.
+  - Something involving going insane due to living in multiple universes simultaneously.
+  - Player is searching for the creature, but has to kill on the way
+
+** Act 3
+
+  - The government comes after him, since he is killing people.
+
+** Act 4
+
+  - After defeating the government, he realizes that every universe he has touched has been getting destroyed. People live in horror.
+  - Anarchy
+  - At the end, he travels to an unknown dimension to live out the rest of his days, lest he completely destroy life for everyone.
+  - The player should realize by the end how messed up he was - the gov wasn't the problem, the player was.
+
+* Boss ideas
+
+** Act 1
+
+   Pan-dimensional creature that you must slay. Better yet: The only reason the creature is pan-dimensional is because of a wormhole you accidentally open (which is how he arrives in your universe). You can't close the wormhole until you defeat it, but then you have to hunt it down.
+
+** Act 2
+   
+   TBD
+
+** Act 3
+   
+   Government agents. Swarms of them, but they act differently in each universe.
+   
+** Act 4
+
+   Creature comes back.
+
+* Terminology
+  
+** Hugh
+
+   The main character (subject to change)
+   
+** Universe
+
+   What is displayed in each viewport.
+   
+** Act
+   
+   What is called "worlds" in the mario games. A group of levels. Each Act ends with a boss fight.
+
+** D3vice
+
+   The device (TBD) that let's Hugh interact with parallel universes.
 
 * Development Notes
   
