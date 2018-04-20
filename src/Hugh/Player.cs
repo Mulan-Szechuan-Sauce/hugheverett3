@@ -33,19 +33,24 @@ namespace Hugh {
 
         public void Update(float dt)
         {
-            // TODO Refactor out the player controls and logic into the Player class
-
             const float ACCELERATION = 7;
             const float MAX_SPEED = 10;
+            const float FRICTION = 8f;
+            const float GRAVITY = 9.8f; 
+            const float JUMP_VEL = 6f;
 
             if (Controller.isLeftPressed() && !Controller.isRightPressed())
             {
-                velocity.X -= ACCELERATION * dt;
+                if (velocity.X > - MAX_SPEED)
+                {
+                    velocity.X = Math.Max(- MAX_SPEED, velocity.X - ACCELERATION * dt);
+                }
             } else if (Controller.isRightPressed() && !Controller.isLeftPressed()) {
-                velocity.X += ACCELERATION * dt;
+                if (velocity.X < MAX_SPEED)
+                {
+                    velocity.X = Math.Min(MAX_SPEED, velocity.X + ACCELERATION * dt);
+                }
             } else {
-                const float FRICTION = 8f;
-
                 if (velocity.X > 0) {
                     velocity.X = Math.Max(0, velocity.X - FRICTION * dt);
                 } else if (velocity.X < 0) {
@@ -53,11 +58,9 @@ namespace Hugh {
                 }
             }
 
-            const float GRAVITY = 9.8f; 
-
             if (Controller.isUpPressed() && this.IsOnFloor)
             {
-                velocity.Y = - 6f;
+                velocity.Y = - JUMP_VEL;
             }
 
             // Gravity.
