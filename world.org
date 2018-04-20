@@ -6,6 +6,10 @@
 
   Every Hugh must arrive at the end goal simultaneously.
 
+  At the end of every level, a single sentence from Hughs thoughts displays on the screen (e.g. "This device is cool.", "Why are these people chasing me?").
+
+  Misc texts will be hidden throughout the levels, which you write down in your notebook. Somehow, gathering information will grant access to optional/bonus content, while aiding the story.
+
 * Artwork
 
   In Act 1, every universe has the same tileset. However, the tileset in each universe will start diverging, starting with Act 2.

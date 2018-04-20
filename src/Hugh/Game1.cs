@@ -117,6 +117,8 @@ namespace Hugh {
 
         private Game1 game;
 
+        public Viewport Viewport { get; set; }
+
         public int Width
         {
             get { return this.width; }
@@ -212,7 +214,12 @@ namespace Hugh {
 
         public void Draw()
         {
-            game.spriteBatch.Begin();
+            game.GraphicsDevice.Viewport = this.Viewport;
+
+            game.spriteBatch.Begin(SpriteSortMode.Deferred,
+                                   BlendState.AlphaBlend,
+                                   null, null, null, null,
+                                   GetCameraTransform());
 
             DrawTiles();
 
@@ -222,6 +229,36 @@ namespace Hugh {
             game.spriteBatch.Draw(tilesetTexture, playerPositionRect, player.TilesetRect, Color.White);
 
             game.spriteBatch.End();
+        }
+
+        private Matrix GetCameraTransform()
+        {
+            int worldWidth = this.width * Tile.SIZE;
+            int worldHeight = this.height * Tile.SIZE;
+
+            int viewportWidth = this.Viewport.Width;
+            int viewportHeight = this.Viewport.Height;
+
+            int cameraX;
+            int cameraY;
+
+            if (worldWidth <= viewportWidth) {
+                cameraX = (worldWidth - viewportWidth) / 2;
+            } else {
+                int playerCenterX = (int)player.position.X + (int)Tile.SIZE / 2;
+                cameraX = playerCenterX - viewportWidth / 2;
+                cameraX = Math.Max(0, Math.Min(worldWidth - viewportWidth, cameraX));
+            }
+
+            if (worldHeight <= viewportHeight) {
+                cameraY = (worldHeight - viewportHeight) / 2;
+            } else {
+                int playerCenterY = (int)player.position.Y + (int)Tile.SIZE / 2;
+                cameraY = playerCenterY - viewportHeight / 2;
+                cameraY = Math.Max(0, Math.Min(worldHeight - viewportHeight, cameraY));
+            }
+
+            return Matrix.CreateScale(new Vector3(1, 1, 0)) * Matrix.CreateTranslation(new Vector3(-cameraX, -cameraY, 0));
         }
 
         private void DrawTiles()
@@ -244,18 +281,12 @@ namespace Hugh {
         {
             // TODO Refactor out the player controls and logic into the Player class
 
-            if (Controller.isLeftPressed())
+            if (Controller.isLeftPressed() && !Controller.isRightPressed())
             {
                 player.velocity.X -= 3 * dt;
-            }
-
-            if (Controller.isRightPressed())
-            {
+            } else if (Controller.isRightPressed() && !Controller.isLeftPressed()) {
                 player.velocity.X += 3 * dt;
-            }
-
-            if (!Controller.isRightPressed() && !Controller.isLeftPressed())
-            {
+            } else {
                 const float FRICTION = 8f;
 
                 if (player.velocity.X > 0) {
@@ -404,7 +435,7 @@ namespace Hugh {
 
         public SpriteBatch spriteBatch;
 
-        Viewport viewportTop, viewportBottom, viewportMain;
+        Viewport viewportMain;
         World world1, world2;
         
         public Game1()
@@ -438,11 +469,13 @@ namespace Hugh {
             world1 = new World(this, map, 1);
             world2 = new World(this, map, 2);
 
-            graphics.PreferredBackBufferHeight = world1.Height * Tile.SIZE * 2;
-            graphics.PreferredBackBufferWidth = world1.Width * Tile.SIZE;
+            graphics.PreferredBackBufferHeight = 720;
+            graphics.PreferredBackBufferWidth = 1280;
             graphics.ApplyChanges();
 
             viewportMain = GraphicsDevice.Viewport;
+
+            Viewport viewportTop, viewportBottom;
 
             viewportTop = viewportMain;
             viewportTop.Height = viewportTop.Height / 2;
@@ -450,6 +483,9 @@ namespace Hugh {
             viewportBottom = viewportMain;
             viewportBottom.Height = viewportBottom.Height / 2;
             viewportBottom.Y = viewportBottom.Height;
+
+            world1.Viewport = viewportTop;
+            world2.Viewport = viewportBottom;
         }
 
         /// <summary>
@@ -489,11 +525,12 @@ namespace Hugh {
         {
             GraphicsDevice.Clear(Color.White);
 
-            GraphicsDevice.Viewport = viewportTop;
             world1.Draw();
-            GraphicsDevice.Viewport = viewportBottom;
             world2.Draw();
+
             GraphicsDevice.Viewport = viewportMain;
+
+            // TODO draw a border between the world viewports
 
             base.Draw(gameTime);
         }
