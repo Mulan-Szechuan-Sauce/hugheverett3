@@ -6,14 +6,14 @@
    eJxjZmBgYCaAGZBoBjQxasljA4TcBcIAJFQAWw==
   </data>
  </layer>
- <layer name="world1" width="8" height="6" visible="0">
+ <layer name="world1" width="8" height="6">
   <data encoding="base64" compression="zlib">
-   eJxjYBh4wIZFjIlIvQACeAAJ
+   eJxjYCAPMJGpDxtgo0AvAAM4AAk=
   </data>
  </layer>
- <layer name="world2" width="8" height="6">
+ <layer name="world2" width="8" height="6" visible="0">
   <data encoding="base64" compression="zlib">
-   eJxjYBh4wIRFjI1IvQACKAAJ
+   eJxjYCAMmIhQQ23ARqQ6AALoAAk=
   </data>
  </layer>
 </map>
