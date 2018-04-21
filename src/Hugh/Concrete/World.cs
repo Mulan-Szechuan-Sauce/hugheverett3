@@ -199,6 +199,8 @@ namespace Hugh
 
             while (HandleFloorCollisions());
 
+            Player.IsOnFloor = IsPlayerOnFloor();
+
             Player.Position.X += Player.Velocity.X;
             Player.Position.Y += Player.Velocity.Y;
         }
@@ -212,9 +214,9 @@ namespace Hugh
             if (pixelY % Tile.SIZE != 0)
                 return false;
 
-            int tileX = (int)Player.Position.X % Tile.SIZE;
+            int tileX = (int)Player.Position.X / Tile.SIZE;
             // The Y coord below the player
-            int tileY = (int)Player.Position.Y % Tile.SIZE + 1;
+            int tileY = (int)Player.Position.Y / Tile.SIZE + 1;
 
             if (tileY >= height)
                 return false;
@@ -270,7 +272,6 @@ namespace Hugh
                     // Floor hit
                     Player.Position.Y = (float)Math.Floor(t.Y - Tile.SIZE);
                     Player.Velocity.Y = 0;
-                    Player.IsOnFloor = true;
                 }
                 else
                 {

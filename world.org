@@ -90,3 +90,5 @@
   Each level can have an associated Lua script... but that will come in the future!
   
   I was looking at how MegaMan handled collisions and tiling, and we can totally do something similar.
+
+  It would be nice to configure universe layouts - for instance in levels that should place universes horizontally instead of stacked.
