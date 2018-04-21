@@ -60,12 +60,12 @@ namespace Hugh {
                 }
             }
 
-            if (!upWasPressed && Controller.isUpPressed() && this.IsOnFloor)
+            if (Controller.isUpPressed() && this.IsOnFloor)
             {
                 velocity.Y = - JUMP_VEL;
             }
 
-            upWasPressed = Controller.isUpPressed();
+            //upWasPressed = Controller.isUpPressed();
 
             // Gravity.
             velocity.Y += GRAVITY * dt;

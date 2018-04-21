@@ -188,12 +188,15 @@ namespace Hugh
 
         public void Update(float dt)
         {
-            player.IsOnFloor = IsPlayerOnFloor();
             player.Update(dt);
+
+            player.IsOnFloor = false;
 
             while (HandleFloorCollisions())
             {
             }
+
+            //player.IsOnFloor = IsPlayerOnFloor();
 
             player.position.X += player.velocity.X;
             player.position.Y += player.velocity.Y;
@@ -272,6 +275,7 @@ namespace Hugh
                     // Floor hit
                     player.position.Y = (float)Math.Floor(t.Y - Tile.SIZE);
                     player.velocity.Y = 0;
+                    player.IsOnFloor = true;
                 } else {
                     // Ceiling hit
                     player.position.Y = (float)Math.Ceiling(t.Y + Tile.SIZE);

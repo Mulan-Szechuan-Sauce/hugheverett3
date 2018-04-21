@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.4" orientation="orthogonal" renderorder="right-down" width="32" height="16" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
+ <tileset firstgid="1" source="tileset.tsx"/>
+ <layer name="universal" width="32" height="16">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+  </data>
+ </layer>
+ <layer name="world1" width="32" height="16" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIJRMApGHmAbQLuZgJh5gDEAJ8gAaQ==
+  </data>
+ </layer>
+ <layer name="world2" width="32" height="16">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIKRCZjR6FH7B8b+gQIg+9mAmGkA7YfhgQAASGwAKg==
+  </data>
+ </layer>
+</map>
