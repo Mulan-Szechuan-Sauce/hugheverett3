@@ -23,8 +23,6 @@ namespace Hugh
 
         Multiverse Multiverse;
 
-        Texture2D BorderTexture;
-
         string LevelName;
         
         public HughGame(string levelName)
@@ -63,11 +61,7 @@ namespace Hugh
             Graphics.ApplyChanges();
 
             ViewportMain = GraphicsDevice.Viewport;
-
             Multiverse.SetViewport(ViewportMain);
-
-            BorderTexture = new Texture2D(GraphicsDevice, 1, 1);
-            BorderTexture.SetData(new[] { Color.Black });
         }
 
         /// <summary>
@@ -107,16 +101,6 @@ namespace Hugh
             GraphicsDevice.Clear(Color.White);
 
             Multiverse.Draw();
-
-            GraphicsDevice.Viewport = ViewportMain;
-
-            // TODO: Move this to the multiverse code
-
-            SpriteBatch.Begin();
-            // Border between the universes
-            SpriteBatch.Draw(BorderTexture, new Rectangle(0, ViewportMain.Height / 2 - 1, ViewportMain.Width, 2),
-                             Color.Black);
-            SpriteBatch.End();
 
             base.Draw(gameTime);
         }

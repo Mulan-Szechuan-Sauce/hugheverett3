@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,26 +11,32 @@ namespace Hugh.Concrete
 {
     public class Multiverse
     {
+        private Texture2D BorderTexture;
         private List<World> Worlds { get; set; } = new List<World>();
         private string UniverseLayout;
+        private int LayoutWidth;
+        private int LayoutHeight;
+        private Viewport Viewport;
+        private HughGame Game;
 
         public Multiverse(HughGame game, TmxMap map)
         {
+            Game = game;
             UniverseLayout = map.Properties["layout"];
 
-            var layoutHeight = CountChars(UniverseLayout, ';');
-            var layoutWidth = CountChars(UniverseLayout, '|') / layoutHeight + 1;
-            var numberOfUniverses = layoutHeight * layoutWidth;
+            BorderTexture = new Texture2D(game.GraphicsDevice, 1, 1);
+            BorderTexture.SetData(new[] { Color.Black });
 
-            for (int i = 1; i <= numberOfUniverses; i++)
+            LayoutHeight = CountChars(UniverseLayout, ';');
+            LayoutWidth = CountChars(UniverseLayout, '|') / LayoutHeight + 1;
+
+            for (int i = 1; i <= LayoutHeight * LayoutWidth; i++)
                 Worlds.Add(new World(game, map, i));
         }
 
         public void SetViewport(Viewport viewport)
         {
-            var layoutHeight = CountChars(UniverseLayout, ';');
-            var layoutWidth = CountChars(UniverseLayout, '|') / layoutHeight + 1;
-            var numberOfUniverses = layoutHeight * layoutWidth;
+            Viewport = viewport;
 
             var x = 0;
             var y = 0;
@@ -40,14 +47,11 @@ namespace Hugh.Concrete
                 World world = Worlds[worldNumber - 1];
 
                 Viewport worldViewport = viewport;
-                worldViewport.Height = viewport.Height / layoutHeight;
-                worldViewport.Width  = viewport.Width / layoutWidth;
+                worldViewport.Height = viewport.Height / LayoutHeight;
+                worldViewport.Width  = viewport.Width / LayoutWidth;
                 worldViewport.Y      = y * worldViewport.Height;
                 worldViewport.X      = x * worldViewport.Width;
                 world.Viewport = worldViewport;
-
-                Console.WriteLine("" + worldViewport.X);
-                Console.WriteLine("" + worldViewport.Y);
 
                 if (UniverseLayout[i + 1] == '|') {
                     x++;
@@ -69,6 +73,37 @@ namespace Hugh.Concrete
 
         public void Update(float dt) => Worlds.ForEach(w => w.Update(dt));
 
-        public void Draw() => Worlds.ForEach(w => w.Draw());
+        public void Draw()
+        {
+            Worlds.ForEach(w => w.Draw());
+
+            Game.GraphicsDevice.Viewport = Viewport;
+
+            DrawBorders();
+        }
+
+        private void DrawBorders()
+        {
+            Game.SpriteBatch.Begin();
+
+            const int BORDER_WIDTH = 2;
+
+            int width = Viewport.Width / LayoutWidth;
+            int height = Viewport.Height / LayoutHeight;
+
+            for (int x = 1; x < LayoutWidth; x++)
+            {
+                var borderRect = new Rectangle(x * width - BORDER_WIDTH / 2, 0, BORDER_WIDTH, Viewport.Height);
+                Game.SpriteBatch.Draw(BorderTexture, borderRect, Color.Black);
+            }
+
+            for (int y = 1; y < LayoutHeight; y++)
+            {
+                var borderRect = new Rectangle(0, y * height - BORDER_WIDTH / 2, Viewport.Width, BORDER_WIDTH);
+                Game.SpriteBatch.Draw(BorderTexture, borderRect, Color.Black);
+            }
+
+            Game.SpriteBatch.End();
+        }
     }
 }
