@@ -56,7 +56,7 @@ namespace Hugh
 
             TmxMap map = new TmxMap("Content/" + LevelName + ".tmx");
 
-            Multiverse = new Multiverse(this, map, 2);
+            Multiverse = new Multiverse(this, map);
 
             Graphics.PreferredBackBufferHeight = 720;
             Graphics.PreferredBackBufferWidth = 1280;
@@ -64,17 +64,7 @@ namespace Hugh
 
             ViewportMain = GraphicsDevice.Viewport;
 
-            Viewport viewportTop, viewportBottom;
-
-            viewportTop = ViewportMain;
-            viewportTop.Height = viewportTop.Height / 2;
-
-            viewportBottom = ViewportMain;
-            viewportBottom.Height = viewportBottom.Height / 2;
-            viewportBottom.Y = viewportBottom.Height;
-
-            Multiverse.GetWorld(1).Viewport = viewportTop;
-            Multiverse.GetWorld(2).Viewport = viewportBottom;
+            Multiverse.SetViewport(ViewportMain);
 
             BorderTexture = new Texture2D(GraphicsDevice, 1, 1);
             BorderTexture.SetData(new[] { Color.Black });
@@ -119,6 +109,8 @@ namespace Hugh
             Multiverse.Draw();
 
             GraphicsDevice.Viewport = ViewportMain;
+
+            // TODO: Move this to the multiverse code
 
             SpriteBatch.Begin();
             // Border between the universes
