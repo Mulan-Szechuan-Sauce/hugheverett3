@@ -270,6 +270,7 @@ namespace Hugh
                     // Floor hit
                     Player.Position.Y = (float)Math.Floor(t.Y - Tile.SIZE);
                     Player.Velocity.Y = 0;
+                    Player.IsOnFloor = true;
                 }
                 else
                 {
