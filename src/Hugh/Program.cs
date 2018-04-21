@@ -14,7 +14,7 @@ namespace Hugh
         static void Main()
         {
             string levelName = "level2";
-            using (var game = new Game1(levelName))
+            using (var game = new HughGame(levelName))
                 game.Run();
         }
     }

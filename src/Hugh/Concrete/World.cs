@@ -1,3 +1,4 @@
+using Hugh.Concrete;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -9,7 +10,7 @@ using TiledSharp;
 
 namespace Hugh
 {
-    class World
+    public class World
     {
         /*
          * Note:
@@ -19,34 +20,34 @@ namespace Hugh
         private Texture2D tilesetTexture;
 
         // The interactive tile layer (the only layer for now)
-        private Player player;
-        private Tile[] tiles;
+        private Player Player;
+        private Tile[] Tiles;
         private int width;
         private int height;
 
-        private Game1 game;
+        private HughGame Game;
 
         public Viewport Viewport { get; set; }
 
         public int Width
         {
-            get { return this.width; }
+            get => width;
         }
 
         public int Height
         {
-            get { return this.height; }
+            get => height;
         }
 
-        public World(Game1 game, TmxMap map, int worldId)
+        public World(HughGame game, TmxMap map, int worldId)
         {
-            this.game = game;
-            this.width = map.Width;
-            this.height = map.Height;
-            this.tiles = new Tile[this.width * this.height];
+            Game = game;
+            width = map.Width;
+            height = map.Height;
+            Tiles = new Tile[width * height];
 
             var tileset = map.Tilesets[0];
-            this.tilesetTexture = game.Content.Load<Texture2D>(tileset.Name.ToString());
+            tilesetTexture = game.Content.Load<Texture2D>(tileset.Name.ToString());
 
             AddTilesFromLayer(findLayer(map, "universal"), tileset);
             AddTilesFromLayer(findLayer(map, string.Format("world{0}", worldId)), tileset);
@@ -78,23 +79,23 @@ namespace Hugh
                     continue;
                 }
 
-                int tilesetTilesWidth = this.tilesetTexture.Width / Tile.SIZE;
+                int tilesetTilesWidth = tilesetTexture.Width / Tile.SIZE;
 
                 int tileFrame = gid - 1;
                 int column = tileFrame % tilesetTilesWidth;
                 int row = tileFrame / tilesetTilesWidth;
 
-                int x = i % this.width;
-                int y = i / this.width;
+                int x = i % width;
+                int y = i / width;
 
                 string tileType = GetTilesetTileType(tileset, tileFrame);
 
                 if ("player".Equals(tileType))
                 {
-                    player = new Player(row, column, new Vector2(x * Tile.SIZE, y * Tile.SIZE));
+                    Player = new Player(row, column, new Vector2(x * Tile.SIZE, y * Tile.SIZE));
                     continue;
                 } else {
-                    this.tiles[y * this.width + x] = new Tile(row, column, x, y, tileType);
+                    Tiles[y * width + x] = new Tile(row, column, x, y, tileType);
                 }
             }
         }
@@ -103,9 +104,8 @@ namespace Hugh
         {
             TmxTilesetTile tilesetTile = TileForId(tileset, id);
             
-            if (tilesetTile == null || ! tilesetTile.Properties.ContainsKey("type")) {
+            if (tilesetTile == null || ! tilesetTile.Properties.ContainsKey("type"))
                 return null;
-            }
 
             return tilesetTile.Properties["type"];
         }
@@ -113,56 +113,62 @@ namespace Hugh
         private TmxTilesetTile TileForId(TmxTileset tileset, int id)
         {
             // Terribly inefficient.. we could pretty easily optimize this if loading is too slow
-            foreach (TmxTilesetTile t in tileset.Tiles) {
-                if (t.Id == id) {
+            foreach (TmxTilesetTile t in tileset.Tiles)
+            {
+                if (t.Id == id)
                     return t;
-                }
             }
             return null;
         }
 
         public void Draw()
         {
-            game.GraphicsDevice.Viewport = this.Viewport;
+            Game.GraphicsDevice.Viewport = Viewport;
 
-            game.spriteBatch.Begin(SpriteSortMode.Deferred,
+            Game.SpriteBatch.Begin(SpriteSortMode.Deferred,
                                    BlendState.AlphaBlend,
                                    null, null, null, null,
                                    GetCameraTransform());
 
             DrawTiles();
 
-            int playerX = (int)player.position.X;
-            int playerY = (int)player.position.Y;
+            int playerX = (int)Player.Position.X;
+            int playerY = (int)Player.Position.Y;
             var playerPositionRect = new Rectangle(playerX, playerY, Tile.SIZE, Tile.SIZE);
-            game.spriteBatch.Draw(tilesetTexture, playerPositionRect, player.TilesetRect, Color.White);
+            Game.SpriteBatch.Draw(tilesetTexture, playerPositionRect, Player.TilesetRect, Color.White);
 
-            game.spriteBatch.End();
+            Game.SpriteBatch.End();
         }
 
         private Matrix GetCameraTransform()
         {
-            int worldWidth = this.width * Tile.SIZE;
-            int worldHeight = this.height * Tile.SIZE;
+            int worldWidth = width * Tile.SIZE;
+            int worldHeight = height * Tile.SIZE;
 
-            int viewportWidth = this.Viewport.Width;
-            int viewportHeight = this.Viewport.Height;
+            int viewportWidth = Viewport.Width;
+            int viewportHeight = Viewport.Height;
 
             int cameraX;
             int cameraY;
 
-            if (worldWidth <= viewportWidth) {
+            if (worldWidth <= viewportWidth)
+            {
                 cameraX = (worldWidth - viewportWidth) / 2;
-            } else {
-                int playerCenterX = (int)player.position.X + (int)Tile.SIZE / 2;
+            }
+            else
+            {
+                int playerCenterX = (int)Player.Position.X + (int)Tile.SIZE / 2;
                 cameraX = playerCenterX - viewportWidth / 2;
                 cameraX = Math.Max(0, Math.Min(worldWidth - viewportWidth, cameraX));
             }
 
-            if (worldHeight <= viewportHeight) {
+            if (worldHeight <= viewportHeight)
+            {
                 cameraY = (worldHeight - viewportHeight) / 2;
-            } else {
-                int playerCenterY = (int)player.position.Y + (int)Tile.SIZE / 2;
+            }
+            else
+            {
+                int playerCenterY = (int)Player.Position.Y + (int)Tile.SIZE / 2;
                 cameraY = playerCenterY - viewportHeight / 2;
                 cameraY = Math.Max(0, Math.Min(worldHeight - viewportHeight, cameraY));
             }
@@ -172,9 +178,9 @@ namespace Hugh
 
         private void DrawTiles()
         {
-            for (int i = 0; i < this.width * this.height; i++)
+            for (int i = 0; i < width * height; i++)
             {
-                Tile t = this.tiles[i];
+                Tile t = Tiles[i];
 
                 if (t == null)
                 {
@@ -182,56 +188,47 @@ namespace Hugh
                 }
 
                 var positionRect = new Rectangle((int)t.X, (int)t.Y, Tile.SIZE, Tile.SIZE);
-                game.spriteBatch.Draw(tilesetTexture, positionRect, t.TilesetRect, Color.White);
+                Game.SpriteBatch.Draw(tilesetTexture, positionRect, t.TilesetRect, Color.White);
             }
         }
 
         public void Update(float dt)
         {
-            player.IsOnFloor = IsPlayerOnFloor();
-            player.Update(dt);
+            Player.IsOnFloor = IsPlayerOnFloor();
+            Player.Update(dt);
 
-            while (HandleFloorCollisions())
-            {
-            }
+            while (HandleFloorCollisions());
 
-            player.position.X += player.velocity.X;
-            player.position.Y += player.velocity.Y;
+            Player.Position.X += Player.Velocity.X;
+            Player.Position.Y += Player.Velocity.Y;
         }
 
         // TODO: Move this to the player class, once the multiverse code is in place
         private bool IsPlayerOnFloor()
         {
-            int pixelX = (int)player.position.X;
-            int pixelY = (int)player.position.Y;
+            int pixelX = (int)Player.Position.X;
+            int pixelY = (int)Player.Position.Y;
 
-            if (pixelY % Tile.SIZE != 0) {
+            if (pixelY % Tile.SIZE != 0)
                 return false;
-            }
 
-            int tileX = (int)player.position.X % Tile.SIZE;
+            int tileX = (int)Player.Position.X % Tile.SIZE;
             // The Y coord below the player
-            int tileY = (int)player.position.Y % Tile.SIZE + 1;
+            int tileY = (int)Player.Position.Y % Tile.SIZE + 1;
 
-            if (tileY >= this.height) {
+            if (tileY >= height)
                 return false;
-            }
 
             // TODO: Add a NullTile class, so you don't have to do annoying null checks like this
 
-            if (this.tiles[tileY * this.width + tileX] != null &&
-                this.tiles[tileY * this.width + tileX].IsGround()) {
+            if (Tiles[tileY * width + tileX] != null && Tiles[tileY * width + tileX].IsGround())
                 return true;
-            }
 
-            if (pixelX % Tile.SIZE == 0 || tileX + 1 >= this.width) {
+            if (pixelX % Tile.SIZE == 0 || tileX + 1 >= width)
                 return false;
-            }
 
-            if (this.tiles[tileY * this.width + tileX + 1] != null &&
-                this.tiles[tileY * this.width + tileX + 1].IsGround()) {
+            if (Tiles[tileY * width + tileX + 1] != null && Tiles[tileY * width + tileX + 1].IsGround())
                 return true;
-            }
 
             return false;
         }
@@ -239,8 +236,8 @@ namespace Hugh
         private bool HandleFloorCollisions()
         {
             // Note: If collisions are handled properly, initialRect should never overlap
-            Rectangle initialRect = ComputeEntityRect(player.position);
-            Rectangle finalRect   = ComputeEntityRect(player.position + player.velocity);
+            Rectangle initialRect = ComputeEntityRect(Player.Position);
+            Rectangle finalRect   = ComputeEntityRect(Player.Position + Player.Velocity);
 
             Rectangle aabb = ComputeAabb(initialRect, finalRect);
 
@@ -255,13 +252,14 @@ namespace Hugh
             }
 
             // TODO: Just get the minimum manhattan distance, don't bother sorting
-            intersectingTiles.Sort((a, b) => {
-                    // Sort by manhattan distance (faster than euclidean, and "good enough")
-                    float distA = Math.Abs(a.X - player.position.X) + Math.Abs(a.Y - player.position.Y);
-                    float distB = Math.Abs(b.X - player.position.X) + Math.Abs(b.Y - player.position.Y);
+            intersectingTiles.Sort((a, b) =>
+            {
+                // Sort by manhattan distance (faster than euclidean, and "good enough")
+                float distA = Math.Abs(a.X - Player.Position.X) + Math.Abs(a.Y - Player.Position.Y);
+                float distB = Math.Abs(b.X - Player.Position.X) + Math.Abs(b.Y - Player.Position.Y);
 
-                    return (distA > distB) ? 1 : -1;
-                });
+                return (distA > distB) ? 1 : -1;
+            });
 
             Tile t = intersectingTiles[0];
 
@@ -270,23 +268,29 @@ namespace Hugh
                 if (initialRect.Y < t.Y)
                 {
                     // Floor hit
-                    player.position.Y = (float)Math.Floor(t.Y - Tile.SIZE);
-                    player.velocity.Y = 0;
-                } else {
-                    // Ceiling hit
-                    player.position.Y = (float)Math.Ceiling(t.Y + Tile.SIZE);
-                    player.velocity.Y = 0;
+                    Player.Position.Y = (float)Math.Floor(t.Y - Tile.SIZE);
+                    Player.Velocity.Y = 0;
                 }
-            } else {
+                else
+                {
+                    // Ceiling hit
+                    Player.Position.Y = (float)Math.Ceiling(t.Y + Tile.SIZE);
+                    Player.Velocity.Y = 0;
+                }
+            }
+            else
+            {
                 if (initialRect.X < t.X)
                 {
                     // Right hit
-                    player.position.X = (float)Math.Floor(t.X - Tile.SIZE);
-                    player.velocity.X = 0;
-                } else {
+                    Player.Position.X = (float)Math.Floor(t.X - Tile.SIZE);
+                    Player.Velocity.X = 0;
+                }
+                else
+                {
                     // Left hit
-                    player.position.X = (float)Math.Ceiling(t.X + Tile.SIZE);
-                    player.velocity.X = 0;
+                    Player.Position.X = (float)Math.Ceiling(t.X + Tile.SIZE);
+                    Player.Velocity.X = 0;
                 }
             }
 
@@ -297,7 +301,7 @@ namespace Hugh
         private bool IsVerticalCollision(Tile t)
         {
             // Comparing floats caused issues with corners
-            return (int)Math.Abs(player.position.Y - t.Y) >= (int)Math.Abs(player.position.X - t.X);
+            return (int)Math.Abs(Player.Position.Y - t.Y) >= (int)Math.Abs(Player.Position.X - t.X);
         }
 
         private List<Tile> GetTilesWithinRect(Rectangle r)
@@ -313,12 +317,12 @@ namespace Hugh
             {
                 for (int y = y1; y < y2; y++)
                 {
-                    if (x >= this.width || x < 0 || y >= this.height || y < 0)
+                    if (x >= width || x < 0 || y >= height || y < 0)
                     {
                         continue;
                     }
 
-                    Tile tile = this.tiles[y * this.width + x];
+                    Tile tile = Tiles[y * width + x];
                     if (tile != null)
                     {
                         tiles.Add(tile);

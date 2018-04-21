@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Hugh.Concrete;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -7,27 +8,30 @@ using System.Collections.Generic;
 
 using TiledSharp;
 
-namespace Hugh {
+namespace Hugh
+{
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game {
-        GraphicsDeviceManager graphics;
+    public class HughGame : Game
+    {
+        GraphicsDeviceManager Graphics;
 
-        public SpriteBatch spriteBatch;
+        public SpriteBatch SpriteBatch;
 
-        Viewport viewportMain;
-        World world1, world2;
+        Viewport ViewportMain;
 
-        Texture2D borderTexture;
+        Multiverse Multiverse;
 
-        string levelName;
+        Texture2D BorderTexture;
+
+        string LevelName;
         
-        public Game1(string levelName)
+        public HughGame(string levelName)
         {
-            graphics = new GraphicsDeviceManager(this);
+            Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            this.levelName = levelName;
+            LevelName = levelName;
         }
 
         /// <summary>
@@ -48,33 +52,32 @@ namespace Hugh {
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            SpriteBatch = new SpriteBatch(GraphicsDevice);
 
-            TmxMap map = new TmxMap("Content/" + this.levelName + ".tmx");
+            TmxMap map = new TmxMap("Content/" + LevelName + ".tmx");
 
-            world1 = new World(this, map, 1);
-            world2 = new World(this, map, 2);
+            Multiverse = new Multiverse(this, map, 2);
 
-            graphics.PreferredBackBufferHeight = 720;
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.ApplyChanges();
+            Graphics.PreferredBackBufferHeight = 720;
+            Graphics.PreferredBackBufferWidth = 1280;
+            Graphics.ApplyChanges();
 
-            viewportMain = GraphicsDevice.Viewport;
+            ViewportMain = GraphicsDevice.Viewport;
 
             Viewport viewportTop, viewportBottom;
 
-            viewportTop = viewportMain;
+            viewportTop = ViewportMain;
             viewportTop.Height = viewportTop.Height / 2;
 
-            viewportBottom = viewportMain;
+            viewportBottom = ViewportMain;
             viewportBottom.Height = viewportBottom.Height / 2;
             viewportBottom.Y = viewportBottom.Height;
 
-            world1.Viewport = viewportTop;
-            world2.Viewport = viewportBottom;
+            Multiverse.GetWorld(1).Viewport = viewportTop;
+            Multiverse.GetWorld(2).Viewport = viewportBottom;
 
-            borderTexture = new Texture2D(GraphicsDevice, 1, 1);
-            borderTexture.SetData(new[] { Color.Black });
+            BorderTexture = new Texture2D(GraphicsDevice, 1, 1);
+            BorderTexture.SetData(new[] { Color.Black });
         }
 
         /// <summary>
@@ -101,8 +104,7 @@ namespace Hugh {
                 LoadContent();
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            world1.Update(dt);
-            world2.Update(dt);
+            Multiverse.Update(dt);
             base.Update(gameTime);
         }
 
@@ -114,16 +116,15 @@ namespace Hugh {
         {
             GraphicsDevice.Clear(Color.White);
 
-            world1.Draw();
-            world2.Draw();
+            Multiverse.Draw();
 
-            GraphicsDevice.Viewport = viewportMain;
+            GraphicsDevice.Viewport = ViewportMain;
 
-            spriteBatch.Begin();
+            SpriteBatch.Begin();
             // Border between the universes
-            spriteBatch.Draw(borderTexture, new Rectangle(0, viewportMain.Height / 2 - 1, viewportMain.Width, 2),
+            SpriteBatch.Draw(BorderTexture, new Rectangle(0, ViewportMain.Height / 2 - 1, ViewportMain.Width, 2),
                              Color.Black);
-            spriteBatch.End();
+            SpriteBatch.End();
 
             base.Draw(gameTime);
         }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props')" />
   <PropertyGroup>
@@ -42,12 +42,13 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Game1.cs" />
+    <Compile Include="Concrete\Multiverse.cs" />
+    <Compile Include="HughGame.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Player.cs" />
-    <Compile Include="Controller.cs" />
-    <Compile Include="Tile.cs" />
-    <Compile Include="World.cs" />
+    <Compile Include="Concrete\Player.cs" />
+    <Compile Include="Concrete\Controller.cs" />
+    <Compile Include="Concrete\Tile.cs" />
+    <Compile Include="Concrete\World.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
