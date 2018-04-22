@@ -197,6 +197,8 @@ namespace Hugh
             Player.IsOnFloor = IsPlayerOnFloor();
             Player.Update(dt);
 
+            HandleObjectCollisions();
+
             while (HandleFloorCollisions());
 
             Player.IsOnFloor = IsPlayerOnFloor();
@@ -235,6 +237,20 @@ namespace Hugh
             return false;
         }
 
+        private void HandleObjectCollisions()
+        {
+            Rectangle hitbox = ComputeEntityRect(Player.Position);
+
+            List<Tile> intersectingTiles = GetTilesWithinRect(hitbox);
+            // Objects count as non-ground tiles
+            intersectingTiles = intersectingTiles.FindAll((tile) => !tile.IsGround());
+
+            foreach (Tile t in intersectingTiles)
+            {
+                Player.Collide(t);
+            }
+        }
+
         private bool HandleFloorCollisions()
         {
             // Note: If collisions are handled properly, initialRect should never overlap
@@ -245,7 +261,6 @@ namespace Hugh
 
             List<Tile> intersectingTiles = GetTilesWithinRect(aabb);
 
-            // TODO: instead of ignoring non-ground tiles, handle them appropriately!
             intersectingTiles = intersectingTiles.FindAll((tile) => tile.IsGround());
 
             if (intersectingTiles.Count == 0)

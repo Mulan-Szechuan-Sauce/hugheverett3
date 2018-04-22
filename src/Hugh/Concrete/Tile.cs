@@ -13,7 +13,7 @@ namespace Hugh.Concrete
         private int x;
         private int y;
 
-        private string Type;
+        public string Type;
 
         // The rectangle of tileset to render for this tile
         public Rectangle TilesetRect

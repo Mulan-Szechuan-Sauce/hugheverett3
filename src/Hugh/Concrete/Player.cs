@@ -70,5 +70,13 @@ namespace Hugh.Concrete
             // Gravity.
             Velocity.Y += GRAVITY * dt;
         }
+
+        public void Collide(Tile tile)
+        {
+            if (tile.Type == "finish")
+            {
+                Console.WriteLine("yeey");
+            }
+        }
     }
 }
