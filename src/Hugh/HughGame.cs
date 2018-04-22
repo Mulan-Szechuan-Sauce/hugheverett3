@@ -26,17 +26,23 @@ namespace Hugh
 
         Multiverse Multiverse;
 
-        string LevelName;
+        private Desktop LevelSelectionDesktop;
+        // TODO: Move the states to an enum
+        private string State;
 
-        private Desktop _host;
+        private string LevelName;
         
-        public HughGame(string levelName)
+        public HughGame()
         {
             Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            LevelName = levelName;
+            SetState("levelselection");
+        }
 
-            IsMouseVisible = true;
+        private void SetState(string state)
+        {
+            IsMouseVisible = "levelselection".Equals(state);
+            State = state;
         }
 
         /// <summary>
@@ -59,45 +65,63 @@ namespace Hugh
             // Create a new SpriteBatch, which can be used to draw textures.
             SpriteBatch = new SpriteBatch(GraphicsDevice);
 
-            TmxMap map = new TmxMap("Content/" + LevelName + ".tmx");
-
-            Multiverse = new Multiverse(this, map);
-
             Graphics.PreferredBackBufferHeight = 720;
             Graphics.PreferredBackBufferWidth = 1280;
             Graphics.ApplyChanges();
 
             ViewportMain = GraphicsDevice.Viewport;
-            Multiverse.SetViewport(ViewportMain);
+
+            LoadLevelSelectionDesktop();
+        }
+
+        private void LoadLevelSelectionDesktop()
+        {
             Myra.MyraEnvironment.Game = this;
 
             // Add it to the desktop
-            _host = new Desktop();
+            LevelSelectionDesktop = new Desktop();
 
-            for (int i = 0; i < 4; i++)
+            const int LEVEL_COUNT = 4;
+
+            for (int i = 0; i < LEVEL_COUNT; i++)
             {
-                const int BUTTON_SIZE = 24;
+                const int GRID_WIDTH = 5;
+                int GRID_HEIGHT = (int)Math.Ceiling((float)LEVEL_COUNT / GRID_WIDTH);
+                const int BUTTON_SIZE = 32;
                 const int BUTTON_MARGIN = 8;
+                const int BUTTON_REGION = BUTTON_SIZE + BUTTON_MARGIN;
                 
                 // Button
                 var button = new Button {
                     Text = "" + (i + 1),
                     WidthHint = BUTTON_SIZE,
                     HeightHint = BUTTON_SIZE,
-                    ContentHorizontalAlignment = HorizontalAlignment.Center
+                    ContentHorizontalAlignment = HorizontalAlignment.Center,
+                    ContentVerticalAlignment = VerticalAlignment.Center
                 };
 
-                button.XHint = (BUTTON_SIZE + BUTTON_MARGIN) * i;
+                int xPos = i % GRID_WIDTH;
+                int yPos = i / GRID_WIDTH;
+
+                button.XHint = ViewportMain.Width / 2 + BUTTON_REGION * (xPos - GRID_WIDTH / 2);
+                button.YHint = ViewportMain.Height / 2 + BUTTON_REGION * (yPos - GRID_HEIGHT);
 
                 button.Up += (ob, ev) => {
                     Button evButton = (Button)ob;
-                    string text = evButton.Text;
-                    LevelName = "level" + text;
-                    LoadContent();
+                    LoadLevel("level" + evButton.Text);
                 };
 
-                _host.Widgets.Add(button);
+                LevelSelectionDesktop.Widgets.Add(button);
             }
+        }
+
+        private void LoadLevel(string levelName)
+        {
+            LevelName = levelName;
+            TmxMap map = new TmxMap("Content/" + levelName + ".tmx");
+            Multiverse = new Multiverse(this, map);
+            Multiverse.SetViewport(ViewportMain);
+            SetState("playing");
         }
 
         /// <summary>
@@ -116,15 +140,19 @@ namespace Hugh
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                SetState("levelselection");
 
-            // Restart
-            if (Keyboard.GetState().IsKeyDown(Keys.R))
-                LoadContent();
+            if (State == "playing")
+            {
+                // Restart
+                if (Keyboard.GetState().IsKeyDown(Keys.R))
+                    LoadLevel(LevelName);
 
-            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Multiverse.Update(dt);
+                float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+                Multiverse.Update(dt);
+            }
+
             base.Update(gameTime);
         }
 
@@ -136,10 +164,18 @@ namespace Hugh
         {
             GraphicsDevice.Clear(Color.White);
 
-            Multiverse.Draw();
+            if (State == "playing")
+            {
+                Multiverse.Draw();
+            }
+            else if (State == "levelselection")
+            {
+                var presParams = GraphicsDevice.PresentationParameters;
 
-            _host.Bounds = new Rectangle(0, 0, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
-_host.Render();
+                LevelSelectionDesktop.Bounds = new Rectangle(0, 0, presParams.BackBufferWidth,
+                                                             presParams.BackBufferHeight);
+                LevelSelectionDesktop.Render();
+            }
 
             base.Draw(gameTime);
         }
