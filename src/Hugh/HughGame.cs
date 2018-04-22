@@ -81,7 +81,7 @@ namespace Hugh
             // Add it to the desktop
             LevelSelectionDesktop = new Desktop();
 
-            const int LEVEL_COUNT = 4;
+            const int LEVEL_COUNT = 5;
 
             for (int i = 0; i < LEVEL_COUNT; i++)
             {
