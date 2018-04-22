@@ -218,7 +218,7 @@ namespace Hugh
             // The Y coord below the player
             int tileY = (int)Player.Position.Y / Tile.SIZE + 1;
 
-            if (tileY >= height)
+            if (tileY >= height || tileX >= width || tileX < 0 || tileY < 0)
                 return false;
 
             // TODO: Add a NullTile class, so you don't have to do annoying null checks like this
