@@ -7,6 +7,9 @@ using System;
 using System.Collections.Generic;
 
 using TiledSharp;
+using Myra.Graphics2D;
+using Myra.Graphics2D.UI;
+using Myra.Utility;
 
 namespace Hugh
 {
@@ -24,12 +27,16 @@ namespace Hugh
         Multiverse Multiverse;
 
         string LevelName;
+
+        private Desktop _host;
         
         public HughGame(string levelName)
         {
             Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             LevelName = levelName;
+
+            IsMouseVisible = true;
         }
 
         /// <summary>
@@ -62,6 +69,35 @@ namespace Hugh
 
             ViewportMain = GraphicsDevice.Viewport;
             Multiverse.SetViewport(ViewportMain);
+            Myra.MyraEnvironment.Game = this;
+
+            // Add it to the desktop
+            _host = new Desktop();
+
+            for (int i = 0; i < 4; i++)
+            {
+                const int BUTTON_SIZE = 24;
+                const int BUTTON_MARGIN = 8;
+                
+                // Button
+                var button = new Button {
+                    Text = "" + (i + 1),
+                    WidthHint = BUTTON_SIZE,
+                    HeightHint = BUTTON_SIZE,
+                    ContentHorizontalAlignment = HorizontalAlignment.Center
+                };
+
+                button.XHint = (BUTTON_SIZE + BUTTON_MARGIN) * i;
+
+                button.Up += (ob, ev) => {
+                    Button evButton = (Button)ob;
+                    string text = evButton.Text;
+                    LevelName = "level" + text;
+                    LoadContent();
+                };
+
+                _host.Widgets.Add(button);
+            }
         }
 
         /// <summary>
@@ -101,6 +137,9 @@ namespace Hugh
             GraphicsDevice.Clear(Color.White);
 
             Multiverse.Draw();
+
+            _host.Bounds = new Rectangle(0, 0, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
+_host.Render();
 
             base.Draw(gameTime);
         }

@@ -60,6 +60,15 @@
     <Reference Include="TiledSharp">
       <HintPath>..\packages\TiledSharp.0.15\lib\TiledSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Extended">
+      <HintPath>..\packages\MonoGame.Extended.0.6.568\lib\portable-net45+win8+wpa81\MonoGame.Extended.dll</HintPath>
+    </Reference>
+    <Reference Include="Myra">
+      <HintPath>..\packages\Myra.0.5.6.113\lib\net45\Myra.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />
