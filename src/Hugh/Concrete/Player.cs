@@ -74,6 +74,11 @@ namespace Hugh.Concrete
             Velocity.Y += GRAVITY * dt;
 
             HandleObjectCollisions(world);
+
+            if (Position.Y + Tile.SIZE > world.Height * Tile.SIZE)
+            {
+                HasDied = true;
+            }
         }
 
         private void HandleObjectCollisions(World world)
