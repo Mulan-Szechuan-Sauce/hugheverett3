@@ -31,6 +31,8 @@ namespace Hugh
         private string State;
 
         private string LevelName;
+
+        public SpriteFont GameFont;
         
         public HughGame()
         {
@@ -70,6 +72,8 @@ namespace Hugh
             Graphics.ApplyChanges();
 
             ViewportMain = GraphicsDevice.Viewport;
+
+            GameFont = Content.Load<SpriteFont>("GameFont");
 
             LoadLevelSelectionDesktop();
         }
@@ -167,6 +171,14 @@ namespace Hugh
             if (State == "playing")
             {
                 Multiverse.Draw();
+
+                if (Multiverse.HasWon)
+                {
+                    SpriteBatch.Begin();
+                    var pos = new Vector2(10, 10);
+                    SpriteBatch.DrawString(GameFont, "VERY NICE. GREAT SUCCESS!", pos, Color.Black);
+                    SpriteBatch.End();
+                }
             }
             else if (State == "levelselection")
             {

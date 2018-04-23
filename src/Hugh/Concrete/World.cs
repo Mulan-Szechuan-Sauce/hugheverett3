@@ -19,8 +19,6 @@ namespace Hugh
          */
         private Texture2D tilesetTexture;
 
-        private SpriteFont gameFont;
-
         // The interactive tile layer (the only layer for now)
         private Player Player;
         private Tile[] Tiles;
@@ -34,6 +32,11 @@ namespace Hugh
         public bool HasDied
         {
             get => Player.HasDied;
+        }
+
+        public bool HasWon
+        {
+            get => Player.IsTouchingFinish;
         }
 
         public int Width
@@ -55,8 +58,6 @@ namespace Hugh
 
             var tileset = map.Tilesets[0];
             tilesetTexture = game.Content.Load<Texture2D>(tileset.Name.ToString());
-
-            gameFont = game.Content.Load<SpriteFont>("GameFont");
 
             AddTilesFromLayer(findLayer(map, "universal"), tileset);
             AddTilesFromLayer(findLayer(map, string.Format("world{0}", worldId)), tileset);
@@ -151,7 +152,7 @@ namespace Hugh
                 var pos = new Vector2((float)Math.Round(Player.Position.X),
                                       (float)Math.Round(Player.Position.Y));
                 pos.Y -= Tile.SIZE;
-                Game.SpriteBatch.DrawString(gameFont, "R.I.P.", pos, Color.Black);
+                Game.SpriteBatch.DrawString(Game.GameFont, "R.I.P.", pos, Color.Black);
             }
 
             Game.SpriteBatch.End();

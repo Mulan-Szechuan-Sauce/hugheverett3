@@ -19,8 +19,14 @@ namespace Hugh.Concrete
         private Viewport Viewport;
         private HughGame Game;
 
+        public bool HasWon { get; set; }
+        public bool HasDied { get; set; }
+
         public Multiverse(HughGame game, TmxMap map)
         {
+            HasWon = false;
+            HasDied = false;
+
             Game = game;
             UniverseLayout = map.Properties["layout"];
 
@@ -73,12 +79,32 @@ namespace Hugh.Concrete
 
         public void Update(float dt)
         {
+            if (HasWon || HasDied)
+            {
+                return;
+            }
+
+            bool hasWon = true;
+
             foreach (World w in Worlds)
             {
                 if (w.HasDied)
                 {
+                    HasDied = true;
                     return;
                 }
+
+                // All worlds have to win before the level is complete
+                if (!w.HasWon)
+                {
+                    hasWon = false;
+                }
+            }
+
+            if (hasWon)
+            {
+                HasWon = true;
+                return;
             }
             
             Worlds.ForEach(w => w.Update(dt));

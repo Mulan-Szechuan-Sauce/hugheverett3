@@ -31,6 +31,7 @@ namespace Hugh.Concrete
         }
 
         public bool HasDied { get; set; }
+        public bool IsTouchingFinish { get; set; }
 
         public Player(int row, int column, Vector2 position)
         {
@@ -88,13 +89,17 @@ namespace Hugh.Concrete
             // Objects count as non-ground tiles
             intersectingTiles = intersectingTiles.FindAll((tile) => !tile.IsGround());
 
-            HasDied = false;
+            IsTouchingFinish = false;
 
             foreach (Tile t in intersectingTiles)
             {
                 if (t.Type == "death")
                 {
                     HasDied = true;
+                }
+                else if (t.Type == "finish")
+                {
+                    IsTouchingFinish = true;
                 }
             }
         }
