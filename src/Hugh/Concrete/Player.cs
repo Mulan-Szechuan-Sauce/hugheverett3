@@ -76,10 +76,12 @@ namespace Hugh.Concrete
 
             HandleObjectCollisions(world);
 
+            const int EDGE_BUF = 5 * Tile.SIZE;
+
             // Note: He shouldn't die by touching the ceiling
             if (Position.Y + Tile.SIZE > world.Height * Tile.SIZE ||
-                Position.X < 0 ||
-                Position.X + Tile.SIZE > world.Width * Tile.SIZE)
+                Position.X < -EDGE_BUF ||
+                Position.X + Tile.SIZE > world.Width * Tile.SIZE + EDGE_BUF)
                 HasDied = true;
         }
 
