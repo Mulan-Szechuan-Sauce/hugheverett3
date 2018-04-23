@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework;
 
 namespace Hugh.Concrete
 {
-    class Tile
+    public class Tile
     {
         // By design, all tiles are 32x32 px
         public const int SIZE = 32;

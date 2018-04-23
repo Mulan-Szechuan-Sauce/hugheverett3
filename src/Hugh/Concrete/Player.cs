@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 using System;
+using System.Collections.Generic;
 
 namespace Hugh.Concrete
 {
@@ -29,6 +30,8 @@ namespace Hugh.Concrete
             get => new Rectangle(SIZE * Column, SIZE * Row, SIZE, SIZE);
         }
 
+        public bool HasDied { get; set; }
+
         public Player(int row, int column, Vector2 position)
         {
             Row = row;
@@ -36,7 +39,7 @@ namespace Hugh.Concrete
             Position = position;
         }
 
-        public void Update(float dt)
+        public void Update(float dt, World world)
         {
             const float ACCELERATION = 7;
             const float MAX_SPEED = 10;
@@ -69,14 +72,27 @@ namespace Hugh.Concrete
 
             // Gravity.
             Velocity.Y += GRAVITY * dt;
+
+            HandleObjectCollisions(world);
         }
 
-        public void Collide(Tile tile)
+        private void HandleObjectCollisions(World world)
         {
-            if (tile.Type == "finish")
+            Rectangle hitbox = World.ComputeEntityRect(Position);
+            List<Tile> intersectingTiles = world.GetTilesWithinRect(hitbox);
+            // Objects count as non-ground tiles
+            intersectingTiles = intersectingTiles.FindAll((tile) => !tile.IsGround());
+
+            HasDied = false;
+
+            foreach (Tile t in intersectingTiles)
             {
-                Console.WriteLine("yeey");
+                if (t.Type == "death")
+                {
+                    HasDied = true;
+                }
             }
         }
+
     }
 }

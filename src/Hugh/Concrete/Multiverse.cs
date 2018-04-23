@@ -71,7 +71,18 @@ namespace Hugh.Concrete
 
         public World GetWorld(int worldNumber) => Worlds[worldNumber - 1];
 
-        public void Update(float dt) => Worlds.ForEach(w => w.Update(dt));
+        public void Update(float dt)
+        {
+            foreach (World w in Worlds)
+            {
+                if (w.HasDied)
+                {
+                    return;
+                }
+            }
+            
+            Worlds.ForEach(w => w.Update(dt));
+        }
 
         public void Draw()
         {

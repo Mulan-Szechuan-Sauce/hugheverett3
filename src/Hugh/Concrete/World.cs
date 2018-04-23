@@ -29,6 +29,11 @@ namespace Hugh
 
         public Viewport Viewport { get; set; }
 
+        public bool HasDied
+        {
+            get => Player.HasDied;
+        }
+
         public int Width
         {
             get => width;
@@ -137,6 +142,11 @@ namespace Hugh
             var playerPositionRect = new Rectangle(playerX, playerY, Tile.SIZE, Tile.SIZE);
             Game.SpriteBatch.Draw(tilesetTexture, playerPositionRect, Player.TilesetRect, Color.White);
 
+            if (Player.HasDied)
+            {
+                Game.SpriteBatch.DrawString(sf, "Score", new Vector(100, 100), Color.Red);
+            }
+
             Game.SpriteBatch.End();
         }
 
@@ -194,10 +204,12 @@ namespace Hugh
 
         public void Update(float dt)
         {
+            if (Player.HasDied) {
+                return;
+            }
+            
             Player.IsOnFloor = IsPlayerOnFloor();
-            Player.Update(dt);
-
-            HandleObjectCollisions();
+            Player.Update(dt, this);
 
             while (HandleFloorCollisions());
 
@@ -235,20 +247,6 @@ namespace Hugh
                 return true;
 
             return false;
-        }
-
-        private void HandleObjectCollisions()
-        {
-            Rectangle hitbox = ComputeEntityRect(Player.Position);
-
-            List<Tile> intersectingTiles = GetTilesWithinRect(hitbox);
-            // Objects count as non-ground tiles
-            intersectingTiles = intersectingTiles.FindAll((tile) => !tile.IsGround());
-
-            foreach (Tile t in intersectingTiles)
-            {
-                Player.Collide(t);
-            }
         }
 
         private bool HandleFloorCollisions()
@@ -321,7 +319,7 @@ namespace Hugh
             return (int)Math.Abs(Player.Position.Y - t.Y) >= (int)Math.Abs(Player.Position.X - t.X);
         }
 
-        private List<Tile> GetTilesWithinRect(Rectangle r)
+        public List<Tile> GetTilesWithinRect(Rectangle r)
         {
             List<Tile> tiles = new List<Tile>();
             
@@ -360,7 +358,7 @@ namespace Hugh
             return new Rectangle(x, y, width, height);
         }
 
-        private static Rectangle ComputeEntityRect(Vector2 position)
+        public static Rectangle ComputeEntityRect(Vector2 position)
         {
             return new Rectangle((int)position.X, (int)position.Y, Tile.SIZE, Tile.SIZE);
         }
