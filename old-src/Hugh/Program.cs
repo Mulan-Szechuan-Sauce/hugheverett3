@@ -1,6 +1,4 @@
-﻿using Ninject;
-using System;
-using System.Reflection;
+﻿using System;
 
 namespace Hugh
 {
@@ -13,12 +11,9 @@ namespace Hugh
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        public static void Main()
+        static void Main()
         {
-            var kernel = new StandardKernel();
-            kernel.Load(Assembly.GetExecutingAssembly());
-
-            using (var game = kernel.Get<HughGame>())
+            using (var game = new HughGame())
                 game.Run();
         }
     }

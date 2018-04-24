@@ -9,8 +9,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("Hugh")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyCompany("Indigo Books & Music")]
-[assembly: AssemblyCopyright("Copyright © Indigo Books & Music 2018")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("c917e836-0a2e-4813-a22a-bc1abc994d6c")]
+[assembly: Guid("7e31573d-0e3e-410a-8129-3703b01b4506")]
 
 // Version information for an assembly consists of the following four values:
 //
