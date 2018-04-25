@@ -1,4 +1,5 @@
 using Hugh.Concrete;
+using Hugh.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -98,26 +99,32 @@ namespace Hugh
                 int x = i % width;
                 int y = i / width;
 
-                string tileType = GetTilesetTileType(tileset, tileFrame);
+                var tileType = GetTilesetTileType(tileset, tileFrame);
 
-                if ("player".Equals(tileType))
+                if (tileType == TileType.Player)
                 {
                     Player = new Player(row, column, new Vector2(x * Tile.SIZE, y * Tile.SIZE));
                     continue;
-                } else {
+                }
+                else
+                {
                     Tiles[y * width + x] = new Tile(row, column, x, y, tileType);
                 }
             }
         }
 
-        private string GetTilesetTileType(TmxTileset tileset, int id)
+        private TileType GetTilesetTileType(TmxTileset tileset, int id)
         {
             TmxTilesetTile tilesetTile = TileForId(tileset, id);
-            
-            if (tilesetTile == null || ! tilesetTile.Properties.ContainsKey("type"))
-                return null;
 
-            return tilesetTile.Properties["type"];
+            if (tilesetTile == null || !tilesetTile.Properties.ContainsKey("type"))
+                throw new Exception($"Tile {id} has no type.");
+
+            var typeString = tilesetTile.Properties["type"];
+            if (Enum.TryParse<TileType>(typeString, true, out var type))
+                return type;
+
+            throw new Exception($"Tile type {typeString} is not valid.");
         }
 
         private TmxTilesetTile TileForId(TmxTileset tileset, int id)
@@ -216,45 +223,12 @@ namespace Hugh
                 return;
             }
             
-            Player.IsOnFloor = IsPlayerOnFloor();
             Player.Update(dt, this);
 
             while (HandleFloorCollisions());
 
-            Player.IsOnFloor = IsPlayerOnFloor();
-
             Player.Position.X += Player.Velocity.X;
             Player.Position.Y += Player.Velocity.Y;
-        }
-
-        // TODO: Move this to the player class, once the multiverse code is in place
-        private bool IsPlayerOnFloor()
-        {
-            int pixelX = (int)Player.Position.X;
-            int pixelY = (int)Player.Position.Y;
-
-            if (pixelY % Tile.SIZE != 0)
-                return false;
-
-            int tileX = (int)Player.Position.X / Tile.SIZE;
-            // The Y coord below the player
-            int tileY = (int)Player.Position.Y / Tile.SIZE + 1;
-
-            if (tileY >= height || tileX >= width || tileX < 0 || tileY < 0)
-                return false;
-
-            // TODO: Add a NullTile class, so you don't have to do annoying null checks like this
-
-            if (Tiles[tileY * width + tileX] != null && Tiles[tileY * width + tileX].IsGround())
-                return true;
-
-            if (pixelX % Tile.SIZE == 0 || tileX + 1 >= width)
-                return false;
-
-            if (Tiles[tileY * width + tileX + 1] != null && Tiles[tileY * width + tileX + 1].IsGround())
-                return true;
-
-            return false;
         }
 
         private bool HandleFloorCollisions()
@@ -370,5 +344,7 @@ namespace Hugh
         {
             return new Rectangle((int)position.X, (int)position.Y, Tile.SIZE, Tile.SIZE);
         }
+
+        public Tile GetTile(int x, int y) => Tiles[y * Width + x];
     }
 }

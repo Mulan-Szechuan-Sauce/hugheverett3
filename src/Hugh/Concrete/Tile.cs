@@ -1,3 +1,4 @@
+using Hugh.Enums;
 using Microsoft.Xna.Framework;
 
 namespace Hugh.Concrete
@@ -13,18 +14,18 @@ namespace Hugh.Concrete
         private int x;
         private int y;
 
-        public string Type;
+        public TileType Type;
 
         // The rectangle of tileset to render for this tile
         public Rectangle TilesetRect
         {
-            get { return new Rectangle(SIZE * Column, SIZE * Row, SIZE, SIZE); }
+            get => new Rectangle(SIZE * Column, SIZE * Row, SIZE, SIZE);
         }
 
         public float X { get => (float)x * SIZE; }
         public float Y { get => (float)y * SIZE; }
 
-        public Tile(int row, int column, int x, int y, string type)
+        public Tile(int row, int column, int x, int y, TileType type)
         {
             Row = row;
             Column = column;
@@ -33,9 +34,6 @@ namespace Hugh.Concrete
             this.y = y;
         }
 
-        public bool IsGround()
-        {
-            return "ground".Equals(Type);
-        }
+        public bool IsGround() => Type == TileType.FlatGround;
     }
 }

@@ -43,6 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Concrete\Multiverse.cs" />
+    <Compile Include="Enums\TileType.cs" />
     <Compile Include="HughGame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Concrete\Player.cs" />

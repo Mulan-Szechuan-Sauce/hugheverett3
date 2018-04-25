@@ -13,7 +13,7 @@
  </tile>
  <tile id="2">
   <properties>
-   <property name="type" value="ground"/>
+   <property name="type" value="flatground"/>
   </properties>
  </tile>
  <tile id="4">

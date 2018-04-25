@@ -1,8 +1,10 @@
+using Hugh.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Hugh.Concrete
 {
@@ -21,8 +23,6 @@ namespace Hugh.Concrete
         private int Column;
 
         private bool UpWasPressed;
-
-        public bool IsOnFloor { get; set; }
 
         // The rectangle of tileset to render for this tile
         public Rectangle TilesetRect
@@ -48,12 +48,12 @@ namespace Hugh.Concrete
             const float GRAVITY = 9.8f; 
             const float JUMP_VEL = 6f;
 
-            if (Controller.isLeftPressed() && !Controller.isRightPressed())
+            if (Controller.IsLeftPressed() && !Controller.IsRightPressed())
             {
                 if (Velocity.X > - MAX_SPEED)
                     Velocity.X = Math.Max(- MAX_SPEED, Velocity.X - ACCELERATION * dt);
             }
-            else if (Controller.isRightPressed() && !Controller.isLeftPressed())
+            else if (Controller.IsRightPressed() && !Controller.IsLeftPressed())
             {
                 if (Velocity.X < MAX_SPEED)
                     Velocity.X = Math.Min(MAX_SPEED, Velocity.X + ACCELERATION * dt);
@@ -66,10 +66,10 @@ namespace Hugh.Concrete
                     Velocity.X = Math.Min(0, Velocity.X + FRICTION * dt);
             }
 
-            if (!UpWasPressed && Controller.isUpPressed() && IsOnFloor)
+            if (!UpWasPressed && Controller.IsUpPressed() && IsPlayerOnFloor(world))
                 Velocity.Y = - JUMP_VEL;
 
-            UpWasPressed = Controller.isUpPressed();
+            UpWasPressed = Controller.IsUpPressed();
 
             // Gravity.
             Velocity.Y += GRAVITY * dt;
@@ -96,16 +96,23 @@ namespace Hugh.Concrete
 
             foreach (Tile t in intersectingTiles)
             {
-                if (t.Type == "death")
+                if (t.Type == TileType.Death)
                 {
                     HasDied = true;
                 }
-                else if (t.Type == "finish")
+                else if (t.Type == TileType.Finish)
                 {
                     IsTouchingFinish = true;
                 }
             }
         }
 
+        public bool IsPlayerOnFloor(World world)
+        {
+            var hitbox = new Rectangle((int)Position.X, (int)Position.Y, SIZE, SIZE + 1);
+            var area = world.GetTilesWithinRect(hitbox);
+
+            return area.Any(o => o.IsGround());
+        }
     }
 }

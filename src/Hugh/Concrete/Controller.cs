@@ -3,16 +3,16 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Hugh.Concrete
 {
-    class Controller
+    public class Controller
     {
         private static bool IsKeyDown(Keys key) => Keyboard.GetState().IsKeyDown(key);
 
-        public static bool isLeftPressed() => IsKeyDown(Keys.Left) || IsKeyDown(Keys.A);
+        public static bool IsLeftPressed() => IsKeyDown(Keys.Left) || IsKeyDown(Keys.A);
 
-        public static bool isRightPressed() => IsKeyDown(Keys.Right) || IsKeyDown(Keys.E);
+        public static bool IsRightPressed() => IsKeyDown(Keys.Right) || IsKeyDown(Keys.E);
 
-        public static bool isUpPressed() => IsKeyDown(Keys.Up) || IsKeyDown(Keys.OemComma);
+        public static bool IsUpPressed() => IsKeyDown(Keys.Up) || IsKeyDown(Keys.OemComma);
 
-        public static bool isDownPressed() => IsKeyDown(Keys.Down) || IsKeyDown(Keys.O);
+        public static bool IsDownPressed() => IsKeyDown(Keys.Down) || IsKeyDown(Keys.O);
     }
 }
