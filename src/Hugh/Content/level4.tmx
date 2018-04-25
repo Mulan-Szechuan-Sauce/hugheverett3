@@ -5,18 +5,63 @@
  </properties>
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer name="universal" width="7" height="16">
-  <data encoding="base64" compression="zlib">
-   eJxjYBgFQxkAAAHAAAE=
-  </data>
+  <data encoding="csv">
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0
+</data>
  </layer>
  <layer name="world1" width="7" height="16">
-  <data encoding="base64" compression="zlib">
-   eJxjZmBgYMaDsQFcckxY5PCZiU0dPvuwmUOOO7HJDUZ3suExE4YBnlwAtw==
-  </data>
+  <data encoding="csv">
+3,3,3,3,3,3,3,
+3,0,0,0,0,0,3,
+3,0,0,0,0,2,3,
+3,0,0,3,3,3,3,
+3,0,0,3,0,0,3,
+3,0,0,0,0,0,3,
+3,3,3,3,3,0,3,
+3,0,0,0,0,0,3,
+3,0,0,0,0,0,3,
+3,0,0,3,3,3,3,
+3,0,0,3,0,0,3,
+3,0,0,0,0,0,3,
+3,3,3,3,3,0,3,
+3,0,0,0,0,0,3,
+3,0,0,0,0,6,3,
+3,3,3,3,3,3,3
+</data>
  </layer>
  <layer name="world2" width="7" height="16">
-  <data encoding="base64" compression="zlib">
-   eJxjYBi5gBkHZkCi0dVTU44Nh3oQYMIih82dABywAEI=
-  </data>
+  <data encoding="csv">
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,
+3,3,3,3,3,3,0,
+3,0,0,0,0,3,0,
+3,0,0,0,0,3,0,
+3,0,0,0,0,3,0,
+3,0,0,0,6,3,0,
+0,0,0,0,2,3,0,
+0,0,3,3,3,3,0
+</data>
  </layer>
 </map>

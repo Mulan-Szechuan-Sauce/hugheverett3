@@ -5,18 +5,33 @@
  </properties>
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer name="universal" width="8" height="6">
-  <data encoding="base64" compression="zlib">
-   eJxjZmBgYCaAGZBoBjQxasljA4TcBcIAJFQAWw==
-  </data>
+  <data encoding="csv">
+3,3,3,3,3,3,3,3,
+3,0,3,0,0,3,0,3,
+3,0,3,0,0,3,0,3,
+3,0,3,0,0,3,0,3,
+3,0,0,0,0,0,0,3,
+3,3,3,3,3,3,3,3
+</data>
  </layer>
  <layer name="world1" width="8" height="6">
-  <data encoding="base64" compression="zlib">
-   eJxjYCAPMJGpDxtgo0AvAAM4AAk=
-  </data>
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,2,0,
+0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,
+0,6,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0
+</data>
  </layer>
  <layer name="world2" width="8" height="6">
-  <data encoding="base64" compression="zlib">
-   eJxjYCAMmIhQQ23ARqQ6AALoAAk=
-  </data>
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,
+0,2,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,6,0,
+0,0,0,0,0,0,0,0
+</data>
  </layer>
 </map>

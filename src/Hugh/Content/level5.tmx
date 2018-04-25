@@ -5,18 +5,39 @@
  </properties>
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer name="universal" width="12" height="8">
-  <data encoding="base64" compression="zlib">
-   eJxjYBgFAwkAAYAAAQ==
-  </data>
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0
+</data>
  </layer>
  <layer name="world1" width="12" height="8" visible="0">
-  <data encoding="base64" compression="zlib">
-   eJxjYBgegBkJE6ueVPOZkPhsBMxgxoHRAQAPtAAt
-  </data>
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,3,3,3,0,0,0,0,0,0,0,
+0,0,3,0,0,0,0,0,0,0,0,0,
+0,0,3,2,0,0,6,3,0,0,0,0,
+0,0,3,3,3,3,3,3,0,0,0,0
+</data>
  </layer>
  <layer name="world2" width="12" height="8">
-  <data encoding="base64" compression="zlib">
-   eJxjYBi6gJlM9WwkqsdlDxMW9TCMyzx0DAAN/AAt
-  </data>
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,3,
+0,0,0,0,0,0,0,0,0,0,0,3,
+0,6,0,0,0,0,0,0,0,0,0,3,
+0,3,0,0,0,0,0,2,0,0,0,3,
+3,3,0,0,0,0,0,3,3,3,3,3
+</data>
  </layer>
 </map>
