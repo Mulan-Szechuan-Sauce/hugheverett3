@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.4" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
+ <properties>
+  <property name="layout" value="1;"/>
+ </properties>
+ <tileset firstgid="1" source="tileset.tsx"/>
+ <layer name="universal" width="10" height="10" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFgwkAAAGQAAE=
+  </data>
+ </layer>
+ <layer name="world1" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjZmBgYCYSEwLkqMNnBy7zKFUHwpxUNI8NjzomJHVcSGxuBky/gzAAdoQAqw==
+  </data>
+ </layer>
+</map>

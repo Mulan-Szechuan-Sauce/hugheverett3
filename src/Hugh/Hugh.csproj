@@ -92,6 +92,9 @@
     <EmbeddedResource Include="Content\level6.tmx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Content\level7.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Content\tilemap.png" />
     <EmbeddedResource Include="Content\tileset.tsx" />
   </ItemGroup>
