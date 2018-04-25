@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.4" orientation="orthogonal" renderorder="right-down" width="21" height="6" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
+<map version="1.0" tiledversion="1.1.4" orientation="orthogonal" renderorder="right-down" width="21" height="7" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
  <properties>
   <property name="layout" value="1;2;3;"/>
  </properties>
  <tileset firstgid="1" source="tileset.tsx"/>
- <layer name="universal" width="21" height="6">
+ <layer name="universal" width="21" height="7">
   <data encoding="base64" compression="zlib">
-   eJxjYIAAZgaGBQwUAGz6h5CZlPJxmkkpjW4mpRgGADQaBNA=
+   eJxjYIAAZgbKADb9QLEFFJqJoZ8eZqL7hQg+NjMppWlhJgZgpgKGAQBVngTr
   </data>
  </layer>
- <layer name="world1" width="21" height="6" visible="0">
+ <layer name="world1" width="21" height="7">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFtAJsJKpnookrsAMABngACQ==
+   eJxjYBgFQwmwkaieiSauwA4ABswACQ==
   </data>
  </layer>
- <layer name="world2" width="21" height="6" visible="0">
+ <layer name="world2" width="21" height="7">
   <data encoding="base64" compression="zlib">
-   eJxjYBgF9AZsBOSZ6OAGAAXYAAk=
+   eJxjYBgFwwGwEZBnooMbAAYsAAk=
   </data>
  </layer>
- <layer name="world3" width="21" height="6">
+ <layer name="world3" width="21" height="7">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFxAI2ND7TgLiCOgAACDgACQ==
+   eJxjYBgFxAI2ND7TgLhi8AIACywACQ==
   </data>
  </layer>
 </map>
