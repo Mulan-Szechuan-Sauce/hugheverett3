@@ -248,17 +248,7 @@ namespace Hugh
                 return false;
             }
 
-            // TODO: Just get the minimum manhattan distance, don't bother sorting
-            intersectingTiles.Sort((a, b) =>
-            {
-                // Sort by manhattan distance (faster than euclidean, and "good enough")
-                float distA = Math.Abs(a.X - Player.Position.X) + Math.Abs(a.Y - Player.Position.Y);
-                float distB = Math.Abs(b.X - Player.Position.X) + Math.Abs(b.Y - Player.Position.Y);
-
-                return (distA > distB) ? 1 : -1;
-            });
-
-            Tile t = intersectingTiles[0];
+            Tile t = GetClosestTile(intersectingTiles, Player.Position);
 
             if (IsVerticalCollision(t))
             {
@@ -294,7 +284,28 @@ namespace Hugh
             return true;
         }
 
-        // TODO: make this work for an arbitrary dynamic object
+        // Expects a non empty tile list
+        private Tile GetClosestTile(List<Tile> tiles, Vector2 origin)
+        {
+            float minDist = 1e30f;
+            Tile minTile = null;
+
+            foreach (Tile t in tiles)
+            {
+                // Sort by manhattan distance (faster than euclidean, and "good enough")
+                float dist = Math.Abs(t.X - origin.X) + Math.Abs(t.Y - origin.Y);
+
+                if (dist < minDist)
+                {
+                    minTile = t;
+                    minDist = dist;
+                }
+            }
+
+            return minTile;
+        }
+
+        // TODO: make this work for an arbitrary dynamic object (in a dynamic object class, really)
         private bool IsVerticalCollision(Tile t)
         {
             // Comparing floats caused issues with corners
