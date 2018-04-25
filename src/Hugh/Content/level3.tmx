@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.4" orientation="orthogonal" renderorder="right-down" width="32" height="6" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
+<map version="1.0" tiledversion="1.1.4" orientation="orthogonal" renderorder="right-down" width="21" height="6" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
  <properties>
   <property name="layout" value="1;2;"/>
  </properties>
  <tileset firstgid="1" source="tileset.tsx"/>
- <layer name="universal" width="32" height="6">
+ <layer name="universal" width="21" height="6">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2DkAgADAAAB
+   eJxjYBgFIxEAAAH4AAE=
   </data>
  </layer>
- <layer name="world1" width="32" height="6">
+ <layer name="world1" width="21" height="6">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFAwmYkTC9xJHF2Mh1OBUAE5pbBgIDAGZsAJ8=
+   eJxjYBi5gBkJU0ucjcpuZEIzn1oYAC88AGw=
   </data>
  </layer>
- <layer name="world2" width="32" height="6">
+ <layer name="world2" width="21" height="6">
   <data encoding="base64" compression="zlib">
-   eJxjYCAdMKPR9Aaj9g+8/WxAzDSA9sMwpQAAPuQALQ==
+   eJxjYCAMmNFoaoCRbiYbEDNR2UwYJgYAACi4AC0=
   </data>
  </layer>
 </map>
