@@ -51,11 +51,12 @@ namespace Hugh.Concrete
 
         public void Update(float dt, World world)
         {
-            const float ACCELERATION = 7;
-            const float MAX_SPEED = 10;
-            const float FRICTION = 8f;
-            const float GRAVITY = 9.8f; 
-            const float JUMP_VEL = 6f;
+            const float MAX_SPEED = 5;
+            // Accelerate to max speec in 0.5 seconds
+            const float ACCELERATION = MAX_SPEED * 2;
+            const float FRICTION = ACCELERATION;
+            const float GRAVITY = 16f;
+            const float JUMP_VEL = 7.8f;
 
             if (Controller.IsLeftPressed() && !Controller.IsRightPressed())
             {
