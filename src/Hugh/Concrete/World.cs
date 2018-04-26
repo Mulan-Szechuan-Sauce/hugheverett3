@@ -149,16 +149,12 @@ namespace Hugh
 
             DrawTiles();
 
-            int playerX = (int)Player.Position.X;
-            int playerY = (int)Player.Position.Y;
-            var playerPositionRect = new Rectangle(playerX, playerY, Tile.SIZE, Tile.SIZE);
-            Game.SpriteBatch.Draw(tilesetTexture, playerPositionRect, Player.TilesetRect, Color.White);
+            Game.SpriteBatch.Draw(tilesetTexture, Player.Hitbox.ToRectangle(), Player.TilesetRect, Color.White);
 
             if (Player.HasDied)
             {
-                var pos = new Vector2((float)Math.Round(Player.Position.X),
-                                      (float)Math.Round(Player.Position.Y));
-                pos.Y -= Tile.SIZE;
+                var pos = Player.Position;
+                pos.Y -= Player.HEIGHT;
                 Game.SpriteBatch.DrawString(Game.GameFont, "R.I.P.", pos, Color.Black);
             }
 
@@ -176,13 +172,15 @@ namespace Hugh
             int cameraX;
             int cameraY;
 
+            Vector2 playerCenter = Player.Hitbox.Center;
+
             if (worldWidth <= viewportWidth)
             {
                 cameraX = (worldWidth - viewportWidth) / 2;
             }
             else
             {
-                int playerCenterX = (int)Player.Position.X + (int)Tile.SIZE / 2;
+                int playerCenterX = (int)playerCenter.X;
                 cameraX = playerCenterX - viewportWidth / 2;
                 cameraX = Math.Max(0, Math.Min(worldWidth - viewportWidth, cameraX));
             }
@@ -193,7 +191,7 @@ namespace Hugh
             }
             else
             {
-                int playerCenterY = (int)Player.Position.Y + (int)Tile.SIZE / 2;
+                int playerCenterY = (int)playerCenter.Y;
                 cameraY = playerCenterY - viewportHeight / 2;
                 cameraY = Math.Max(0, Math.Min(worldHeight - viewportHeight, cameraY));
             }
@@ -225,19 +223,19 @@ namespace Hugh
             
             Player.Update(dt, this);
 
-            while (HandleFloorCollisions());
+            while (HandleGroundCollisions());
 
             Player.Position.X += Player.Velocity.X;
             Player.Position.Y += Player.Velocity.Y;
         }
 
-        private bool HandleFloorCollisions()
+        private bool HandleGroundCollisions()
         {
             // Note: If collisions are handled properly, initialRect should never overlap
-            Rectangle initialRect = ComputeEntityRect(Player.Position);
-            Rectangle finalRect   = ComputeEntityRect(Player.Position + Player.Velocity);
+            RectangleF initialRect = Player.Hitbox;
+            RectangleF finalRect   = OffsetRect(initialRect, Player.Velocity);
 
-            Rectangle aabb = ComputeAabb(initialRect, finalRect);
+            RectangleF aabb = RectangleF.Union(initialRect, finalRect);
 
             List<Tile> intersectingTiles = GetTilesWithinRect(aabb);
 
@@ -255,7 +253,7 @@ namespace Hugh
                 if (initialRect.Y < t.Y)
                 {
                     // Floor hit
-                    Player.Position.Y = (float)Math.Floor(t.Y - Tile.SIZE);
+                    Player.Position.Y = (float)Math.Floor(t.Y - Player.HEIGHT);
                     Player.Velocity.Y = 0;
                 }
                 else
@@ -270,7 +268,7 @@ namespace Hugh
                 if (initialRect.X < t.X)
                 {
                     // Right hit
-                    Player.Position.X = (float)Math.Floor(t.X - Tile.SIZE);
+                    Player.Position.X = (float)Math.Floor(t.X - Player.WIDTH);
                     Player.Velocity.X = 0;
                 }
                 else
@@ -308,18 +306,21 @@ namespace Hugh
         // TODO: make this work for an arbitrary dynamic object (in a dynamic object class, really)
         private bool IsVerticalCollision(Tile t)
         {
+            // FIXME this is broken for the oblong-shaped player
+            Vector2 tileCenter = t.Hitbox.Center;
+            Vector2 playerCenter = Player.Hitbox.Center;
             // Comparing floats caused issues with corners
-            return (int)Math.Abs(Player.Position.Y - t.Y) >= (int)Math.Abs(Player.Position.X - t.X);
+            return (int)Math.Abs(playerCenter.Y - tileCenter.Y) >= (int)Math.Abs(playerCenter.X - tileCenter.X);
         }
 
-        public List<Tile> GetTilesWithinRect(Rectangle r)
+        public List<Tile> GetTilesWithinRect(RectangleF r)
         {
             List<Tile> tiles = new List<Tile>();
             
-            int x1 = (int)Math.Floor((float)r.X / Tile.SIZE);
-            int x2 = (int)Math.Ceiling((float)(r.X + r.Width) / Tile.SIZE);
-            int y1 = (int)Math.Floor((float)r.Y / Tile.SIZE);
-            int y2 = (int)Math.Ceiling((float)(r.Y + r.Height) / Tile.SIZE);
+            int x1 = (int)Math.Floor(r.X / Tile.SIZE);
+            int x2 = (int)Math.Ceiling((r.X + r.Width) / Tile.SIZE);
+            int y1 = (int)Math.Floor(r.Y / Tile.SIZE);
+            int y2 = (int)Math.Ceiling((r.Y + r.Height) / Tile.SIZE);
             
             for (int x = x1; x < x2; x++)
             {
@@ -341,19 +342,9 @@ namespace Hugh
             return tiles;
         }
 
-        private static Rectangle ComputeAabb(Rectangle a, Rectangle b)
+        private static RectangleF OffsetRect(RectangleF rect, Vector2 offset)
         {
-            int x = Math.Min(a.X, b.X);
-            int y = Math.Min(a.Y, b.Y);
-            int width = Math.Max(a.X + a.Width, b.X + b.Width) - x;
-            int height = Math.Max(a.Y + a.Height, b.Y + b.Height) - y;
-
-            return new Rectangle(x, y, width, height);
-        }
-
-        public static Rectangle ComputeEntityRect(Vector2 position)
-        {
-            return new Rectangle((int)position.X, (int)position.Y, Tile.SIZE, Tile.SIZE);
+            return new RectangleF(rect.X + offset.X, rect.Y + offset.Y, rect.Width, rect.Height);
         }
 
         public Tile GetTile(int x, int y) => Tiles[y * Width + x];

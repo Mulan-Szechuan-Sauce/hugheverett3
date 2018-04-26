@@ -4,7 +4,7 @@
   <property name="layout" value="1;2;"/>
  </properties>
  <tileset firstgid="1" source="tileset.tsx"/>
- <layer name="universal" width="12" height="8">
+ <layer name="universal" width="12" height="8" visible="0">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
@@ -16,7 +16,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer name="world1" width="12" height="8" visible="0">
+ <layer name="world1" width="12" height="8">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,

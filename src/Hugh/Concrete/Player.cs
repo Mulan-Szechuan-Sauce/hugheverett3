@@ -1,3 +1,4 @@
+using Hugh.Concrete;
 using Hugh.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,8 +15,9 @@ namespace Hugh.Concrete
      */
     class Player
     {
-        // By design, the player is 32x32 px (for now?)
-        private const int SIZE = 32;
+        // By design, the player hitbox is 32x48 px (FOREVER)
+        public const int WIDTH = 32;
+        public const int HEIGHT = 48;
 
         public Vector2 Position;
         public Vector2 Velocity;
@@ -24,10 +26,17 @@ namespace Hugh.Concrete
 
         private bool UpWasPressed;
 
+        // TODO: Draw using the dynamic object / player tileset, not the world tileset!
+
         // The rectangle of tileset to render for this tile
         public Rectangle TilesetRect
         {
-            get => new Rectangle(SIZE * Column, SIZE * Row, SIZE, SIZE);
+            get => new Rectangle(WIDTH * Column, WIDTH * Row, Tile.SIZE, Tile.SIZE);
+        }
+
+        public RectangleF Hitbox
+        {
+            get => new RectangleF(Position.X, Position.Y, WIDTH, HEIGHT);
         }
 
         public bool HasDied { get; set; }
@@ -79,16 +88,15 @@ namespace Hugh.Concrete
             const int EDGE_BUF = 5 * Tile.SIZE;
 
             // Note: He shouldn't die by touching the ceiling
-            if (Position.Y + Tile.SIZE > world.Height * Tile.SIZE ||
+            if (Position.Y + HEIGHT > world.Height * Tile.SIZE ||
                 Position.X < -EDGE_BUF ||
-                Position.X + Tile.SIZE > world.Width * Tile.SIZE + EDGE_BUF)
+                Position.X + WIDTH > world.Width * Tile.SIZE + EDGE_BUF)
                 HasDied = true;
         }
 
         private void HandleObjectCollisions(World world)
         {
-            Rectangle hitbox = World.ComputeEntityRect(Position);
-            List<Tile> intersectingTiles = world.GetTilesWithinRect(hitbox);
+            List<Tile> intersectingTiles = world.GetTilesWithinRect(Hitbox);
             // Objects count as non-ground tiles
             intersectingTiles = intersectingTiles.FindAll((tile) => !tile.IsGround());
 
@@ -109,9 +117,10 @@ namespace Hugh.Concrete
 
         public bool IsPlayerOnFloor(World world)
         {
-            var hitbox = new Rectangle((int)Position.X, (int)Position.Y, SIZE, SIZE + 1);
-            var area = world.GetTilesWithinRect(hitbox);
+            var extendedHitbox = new RectangleF(Hitbox);
+            extendedHitbox.Height = extendedHitbox.Height + 1;
 
+            var area = world.GetTilesWithinRect(extendedHitbox);
             return area.Any(o => o.IsGround());
         }
     }

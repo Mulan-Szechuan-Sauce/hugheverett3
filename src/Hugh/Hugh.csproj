@@ -51,6 +51,7 @@
     <Compile Include="Concrete\Tile.cs" />
     <Compile Include="Concrete\World.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Concrete\RectangleF.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
