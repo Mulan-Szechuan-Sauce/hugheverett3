@@ -99,5 +99,13 @@ namespace Hugh.Concrete
                                   Math.Max(rectA.Right,  rectB.Right) - x,
                                   Math.Max(rectA.Bottom, rectB.Bottom) - y);
         }
+
+        public bool Intersects(RectangleF value)
+        {
+            return value.Left < Right &&
+                Left < value.Right &&
+                value.Top < Bottom &&
+                Top < value.Bottom;
+        }
     }
 }

@@ -306,11 +306,10 @@ namespace Hugh
         // TODO: make this work for an arbitrary dynamic object (in a dynamic object class, really)
         private bool IsVerticalCollision(Tile t)
         {
-            // FIXME this is broken for the oblong-shaped player
-            Vector2 tileCenter = t.Hitbox.Center;
-            Vector2 playerCenter = Player.Hitbox.Center;
-            // Comparing floats caused issues with corners
-            return (int)Math.Abs(playerCenter.Y - tileCenter.Y) >= (int)Math.Abs(playerCenter.X - tileCenter.X);
+            // Worst case ontario, this tile will be checked twice!!!
+            var newYHitbox = new RectangleF(Player.Hitbox);
+            newYHitbox.Y += Player.Velocity.Y;
+            return newYHitbox.Intersects(t.Hitbox);
         }
 
         public List<Tile> GetTilesWithinRect(RectangleF r)
@@ -332,7 +331,7 @@ namespace Hugh
                     }
 
                     Tile tile = Tiles[y * width + x];
-                    if (tile != null)
+                    if (tile != null && tile.Type != TileType.Empty)
                     {
                         tiles.Add(tile);
                     }
