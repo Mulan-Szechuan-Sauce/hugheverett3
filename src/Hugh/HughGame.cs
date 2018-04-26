@@ -33,6 +33,8 @@ namespace Hugh
         private string LevelName;
 
         public SpriteFont GameFont;
+
+        public TilesetManager TilesetManager;
         
         public HughGame()
         {
@@ -66,6 +68,7 @@ namespace Hugh
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             SpriteBatch = new SpriteBatch(GraphicsDevice);
+            TilesetManager = new TilesetManager(this);
 
             Graphics.PreferredBackBufferHeight = 720;
             Graphics.PreferredBackBufferWidth = 1280;
@@ -123,6 +126,7 @@ namespace Hugh
         {
             LevelName = levelName;
             TmxMap map = new TmxMap("Content/" + levelName + ".tmx");
+            TilesetManager.LoadMap(map);
             Multiverse = new Multiverse(this, map);
             Multiverse.SetViewport(ViewportMain);
             SetState("playing");

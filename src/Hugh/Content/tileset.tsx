@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset name="tilemap" tilewidth="32" tileheight="32" tilecount="12" columns="2">
+<tileset name="" tilewidth="32" tileheight="32" tilecount="12" columns="2">
  <image source="tilemap.png" trans="ffffff" width="64" height="192"/>
  <tile id="0">
   <properties>

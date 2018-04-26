@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using TiledSharp;
 
@@ -13,13 +14,6 @@ namespace Hugh
 {
     public class World
     {
-        /*
-         * Note:
-         * This should stay be a per-world property, since we can
-         * potentiallly have different tileset for each world.
-         */
-        private Texture2D tilesetTexture;
-
         // The interactive tile layer (the only layer for now)
         private Player Player;
         private Tile[] Tiles;
@@ -57,14 +51,11 @@ namespace Hugh
             height = map.Height;
             Tiles = new Tile[width * height];
 
-            var tileset = map.Tilesets[0];
-            tilesetTexture = game.Content.Load<Texture2D>(tileset.Name.ToString());
-
-            AddTilesFromLayer(findLayer(map, "universal"), tileset);
-            AddTilesFromLayer(findLayer(map, string.Format("world{0}", worldId)), tileset);
+            AddTilesFromLayer(FindLayer(map, "universal"));
+            AddTilesFromLayer(FindLayer(map, string.Format("world{0}", worldId)));
         }
 
-        private TmxLayer findLayer(TmxMap map, string name)
+        private TmxLayer FindLayer(TmxMap map, string name)
         {
             foreach (TmxLayer layer in map.Layers)
             {
@@ -74,10 +65,11 @@ namespace Hugh
                 }
             }
             // Suck it up buttercup
+            Trace.Assert(false);
             return null;
         }
 
-        private void AddTilesFromLayer(TmxLayer layer, TmxTileset tileset)
+        private void AddTilesFromLayer(TmxLayer layer)
         {
             for (var i = 0; i < layer.Tiles.Count; i++)
             {
@@ -90,52 +82,21 @@ namespace Hugh
                     continue;
                 }
 
-                int tilesetTilesWidth = tilesetTexture.Width / Tile.SIZE;
-
-                int tileFrame = gid - 1;
-                int column = tileFrame % tilesetTilesWidth;
-                int row = tileFrame / tilesetTilesWidth;
-
                 int x = i % width;
                 int y = i / width;
 
-                var tileType = GetTilesetTileType(tileset, tileFrame);
+                var tileType = Game.TilesetManager.GetTileType(gid);
 
                 if (tileType == TileType.Player)
                 {
-                    Player = new Player(row, column, new Vector2(x * Tile.SIZE, y * Tile.SIZE));
+                    Player = new Player(new Vector2(x * Tile.SIZE, y * Tile.SIZE), gid);
                     continue;
                 }
                 else
                 {
-                    Tiles[y * width + x] = new Tile(row, column, x, y, tileType);
+                    Tiles[y * width + x] = new Tile(x, y, tileType, gid);
                 }
             }
-        }
-
-        private TileType GetTilesetTileType(TmxTileset tileset, int id)
-        {
-            TmxTilesetTile tilesetTile = TileForId(tileset, id);
-
-            if (tilesetTile == null || !tilesetTile.Properties.ContainsKey("type"))
-                throw new Exception($"Tile {id} has no type.");
-
-            var typeString = tilesetTile.Properties["type"];
-            if (Enum.TryParse<TileType>(typeString, true, out var type))
-                return type;
-
-            throw new Exception($"Tile type {typeString} is not valid.");
-        }
-
-        private TmxTilesetTile TileForId(TmxTileset tileset, int id)
-        {
-            // Terribly inefficient.. we could pretty easily optimize this if loading is too slow
-            foreach (TmxTilesetTile t in tileset.Tiles)
-            {
-                if (t.Id == id)
-                    return t;
-            }
-            return null;
         }
 
         public void Draw()
@@ -149,7 +110,7 @@ namespace Hugh
 
             DrawTiles();
 
-            Game.SpriteBatch.Draw(tilesetTexture, Player.Hitbox.ToRectangle(), Player.TilesetRect, Color.White);
+            Game.TilesetManager.DrawGid(Player.TilesetGid, Player.Hitbox.ToRectangle());
 
             if (Player.HasDied)
             {
@@ -211,7 +172,7 @@ namespace Hugh
                 }
 
                 var positionRect = new Rectangle((int)t.X, (int)t.Y, Tile.SIZE, Tile.SIZE);
-                Game.SpriteBatch.Draw(tilesetTexture, positionRect, t.TilesetRect, Color.White);
+                Game.TilesetManager.DrawGid(t.TilesetGid, positionRect);
             }
         }
 

@@ -21,18 +21,12 @@ namespace Hugh.Concrete
 
         public Vector2 Position;
         public Vector2 Velocity;
-        private int Row;
-        private int Column;
+
+        public int TilesetGid { get; private set; }
 
         private bool UpWasPressed;
 
         // TODO: Draw using the dynamic object / player tileset, not the world tileset!
-
-        // The rectangle of tileset to render for this tile
-        public Rectangle TilesetRect
-        {
-            get => new Rectangle(WIDTH * Column, WIDTH * Row, Tile.SIZE, Tile.SIZE);
-        }
 
         public RectangleF Hitbox
         {
@@ -42,10 +36,9 @@ namespace Hugh.Concrete
         public bool HasDied { get; set; }
         public bool IsTouchingFinish { get; set; }
 
-        public Player(int row, int column, Vector2 position)
+        public Player(Vector2 position, int tilesetGid)
         {
-            Row = row;
-            Column = column;
+            TilesetGid = tilesetGid;
             Position = position;
         }
 
