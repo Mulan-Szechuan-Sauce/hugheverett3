@@ -112,6 +112,7 @@ namespace Hugh
                 "level4",
                 "level5",
                 "level6",
+                "level8",
             };
 
             int index = 0;

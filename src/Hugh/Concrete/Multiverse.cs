@@ -62,6 +62,7 @@ namespace Hugh.Concrete
                 if (UniverseLayout[i + 1] == '|') {
                     x++;
                 } else {
+                    x = 0;
                     y++;
                 }
             }
