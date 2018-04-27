@@ -172,9 +172,6 @@ namespace Hugh
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-                SetState("levelselection");
-
             if (State == "playing")
             {
                 // Restart
@@ -184,6 +181,12 @@ namespace Hugh
                 float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
                 Multiverse.Update(dt);
             }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                if (InitialLevelName == null)
+                    SetState("levelselection");
+                else
+                    Exit();
 
             base.Update(gameTime);
         }
