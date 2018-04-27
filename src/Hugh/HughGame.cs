@@ -29,6 +29,7 @@ namespace Hugh
         private Desktop LevelSelectionDesktop;
         // TODO: Move the states to an enum
         private string State;
+        private string InitialLevelName;
 
         private string LevelName;
 
@@ -41,6 +42,12 @@ namespace Hugh
             Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             SetState("levelselection");
+            InitialLevelName = null;
+        }
+
+        public HughGame(string levelName) : this()
+        {
+            InitialLevelName = levelName;
         }
 
         private void SetState(string state)
@@ -79,6 +86,12 @@ namespace Hugh
             GameFont = Content.Load<SpriteFont>("GameFont");
 
             LoadLevelSelectionDesktop();
+
+            if (InitialLevelName != null)
+            {
+                LoadLevel(InitialLevelName);
+                State = "playing";
+            }
         }
 
         private void LoadLevelSelectionDesktop()
