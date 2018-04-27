@@ -90,36 +90,47 @@ namespace Hugh
 
             const int LEVEL_COUNT = 7;
 
-            for (int i = 0; i < LEVEL_COUNT; i++)
-            {
+            // TODO: _possibly_ move this into a config file
+            List<string> levelNames = new List<string>() {
+                "level7",
+                "level1",
+                "level2",
+                "level3",
+                "level4",
+                "level5",
+                "level6",
+            };
+
+            int index = 0;
+
+            levelNames.ForEach(levelName => {
                 const int GRID_WIDTH = 5;
                 int GRID_HEIGHT = (int)Math.Ceiling((float)LEVEL_COUNT / GRID_WIDTH);
                 const int BUTTON_SIZE = 32;
                 const int BUTTON_MARGIN = 8;
                 const int BUTTON_REGION = BUTTON_SIZE + BUTTON_MARGIN;
-                
+
                 // Button
                 var button = new Button {
-                    Text = "" + (i + 1),
+                    Text = "" + (index + 1),
                     WidthHint = BUTTON_SIZE,
                     HeightHint = BUTTON_SIZE,
                     ContentHorizontalAlignment = HorizontalAlignment.Center,
                     ContentVerticalAlignment = VerticalAlignment.Center
                 };
 
-                int xPos = i % GRID_WIDTH;
-                int yPos = i / GRID_WIDTH;
+                int xPos = index % GRID_WIDTH;
+                int yPos = index / GRID_WIDTH;
 
                 button.XHint = ViewportMain.Width / 2 + BUTTON_REGION * (xPos - GRID_WIDTH / 2);
                 button.YHint = ViewportMain.Height / 2 + BUTTON_REGION * (yPos - GRID_HEIGHT);
 
-                button.Up += (ob, ev) => {
-                    Button evButton = (Button)ob;
-                    LoadLevel("level" + evButton.Text);
-                };
+                button.Up += (ob, ev) => LoadLevel(levelName);
 
                 LevelSelectionDesktop.Widgets.Add(button);
-            }
+
+                index++;
+            });
         }
 
         private void LoadLevel(string levelName)
