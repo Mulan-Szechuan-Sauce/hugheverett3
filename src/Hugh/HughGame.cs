@@ -36,6 +36,9 @@ namespace Hugh
         public SpriteFont GameFont;
 
         public TilesetManager TilesetManager;
+
+        private List<string> LevelNames;
+        private int CurrentLevelIndex;
         
         public HughGame()
         {
@@ -101,10 +104,8 @@ namespace Hugh
             // Add it to the desktop
             LevelSelectionDesktop = new Desktop();
 
-            const int LEVEL_COUNT = 7;
-
             // TODO: _possibly_ move this into a config file
-            List<string> levelNames = new List<string>() {
+            LevelNames = new List<string>() {
                 "intro_controls",
                 "intro2",
                 "intro3",
@@ -119,9 +120,9 @@ namespace Hugh
 
             int index = 0;
 
-            levelNames.ForEach(levelName => {
+            LevelNames.ForEach(levelName => {
                 const int GRID_WIDTH = 5;
-                int GRID_HEIGHT = (int)Math.Ceiling((float)LEVEL_COUNT / GRID_WIDTH);
+                int GRID_HEIGHT = (int)Math.Ceiling((float)LevelNames.Count / GRID_WIDTH);
                 const int BUTTON_SIZE = 32;
                 const int BUTTON_MARGIN = 8;
                 const int BUTTON_REGION = BUTTON_SIZE + BUTTON_MARGIN;
@@ -141,7 +142,8 @@ namespace Hugh
                 button.XHint = ViewportMain.Width / 2 + BUTTON_REGION * (xPos - GRID_WIDTH / 2);
                 button.YHint = ViewportMain.Height / 2 + BUTTON_REGION * (yPos - GRID_HEIGHT);
 
-                button.Up += (ob, ev) => LoadLevel(levelName);
+                var levelIndex = index;
+                button.Up += (ob, ev) => LoadLevel(levelName, levelIndex);
 
                 LevelSelectionDesktop.Widgets.Add(button);
 
@@ -149,9 +151,11 @@ namespace Hugh
             });
         }
 
-        private void LoadLevel(string levelName)
+        private void LoadLevel(string levelName, int levelIndex = -1)
         {
             LevelName = levelName;
+            CurrentLevelIndex = levelIndex;
+            Console.WriteLine("Level index: " + CurrentLevelIndex);
             TmxMap map = new TmxMap("Content/" + levelName + ".tmx");
             TilesetManager.LoadMap(map);
             Multiverse = new Multiverse(this, map);
@@ -175,17 +179,24 @@ namespace Hugh
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            var keyState = Keyboard.GetState();
+
             if (State == "playing")
             {
                 // Restart
-                if (Keyboard.GetState().IsKeyDown(Keys.R))
-                    LoadLevel(LevelName);
+                if (keyState.IsKeyDown(Keys.R))
+                    LoadLevel(LevelName, CurrentLevelIndex);
 
                 float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
                 Multiverse.Update(dt);
+
+                if (Multiverse.HasWon && keyState.IsKeyDown(Keys.N) && HasNextLevel())
+                {
+                    LoadLevel(LevelNames[CurrentLevelIndex + 1], CurrentLevelIndex + 1);
+                }
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (keyState.IsKeyDown(Keys.Escape))
                 if (InitialLevelName == null)
                     SetState("levelselection");
                 else
@@ -209,8 +220,11 @@ namespace Hugh
                 if (Multiverse.HasWon)
                 {
                     SpriteBatch.Begin();
-                    var pos = new Vector2(10, 10);
-                    SpriteBatch.DrawString(GameFont, "VERY NICE. GREAT SUCCESS!", pos, Color.Black);
+                    SpriteBatch.DrawString(GameFont, "VERY NICE. GREAT SUCCESS!",
+                                           new Vector2(10, 10), Color.Black);
+                    if (HasNextLevel())
+                        SpriteBatch.DrawString(GameFont, "Press N to continue...",
+                                               new Vector2(10, 30), Color.Black);
                     SpriteBatch.End();
                 }
             }
@@ -224,6 +238,11 @@ namespace Hugh
             }
 
             base.Draw(gameTime);
+        }
+
+        private bool HasNextLevel()
+        {
+            return CurrentLevelIndex >= 0 && CurrentLevelIndex < LevelNames.Count - 1;
         }
     }
 }
