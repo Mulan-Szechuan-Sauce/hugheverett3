@@ -105,8 +105,10 @@ namespace Hugh
 
             // TODO: _possibly_ move this into a config file
             List<string> levelNames = new List<string>() {
-                "level7",
-                "level1",
+                "intro_controls",
+                "intro2",
+                "intro3",
+                "intro_momentum",
                 "level2",
                 "level3",
                 "level4",

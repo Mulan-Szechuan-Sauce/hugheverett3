@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.4" orientation="orthogonal" renderorder="right-down" width="12" height="6" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
+ <properties>
+  <property name="layout" value="1;2;"/>
+ </properties>
+ <tileset firstgid="1" source="tileset.tsx"/>
+ <tileset firstgid="13" source="player.tsx"/>
+ <layer name="universal" width="12" height="6" visible="0">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer name="world1" width="12" height="6">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,2,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,1,0,1,0,0,0,0,
+0,0,0,0,0,3,13,3,0,0,0,0,
+0,0,0,0,0,3,3,3,0,0,0,0
+</data>
+ </layer>
+ <layer name="world2" width="12" height="6">
+  <data encoding="csv">
+3,3,3,3,3,3,3,3,3,3,3,3,
+3,0,0,0,0,0,0,0,0,0,2,3,
+3,0,0,0,0,0,0,0,0,0,0,3,
+3,0,0,0,0,0,0,0,0,0,0,3,
+3,13,0,0,0,0,0,0,0,0,0,3,
+3,3,3,3,3,0,0,3,3,3,3,3
+</data>
+ </layer>
+</map>
