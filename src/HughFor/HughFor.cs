@@ -22,6 +22,7 @@ namespace HughFor
         public SpriteBatch SpriteBatch;
         public Viewport ViewportMain;
         public TilesetManager TilesetManager;
+        public Multiverse Multiverse;
         
         public HughFor()
         {
@@ -57,6 +58,16 @@ namespace HughFor
             Graphics.ApplyChanges();
 
             ViewportMain = GraphicsDevice.Viewport;
+
+            LoadLevel("level1");
+        }
+
+        private void LoadLevel(string levelName)
+        {
+            TmxMap map = new TmxMap("Content/" + levelName + ".tmx");
+            TilesetManager.LoadMap(map);
+            Multiverse = new Multiverse(this, map);
+            Multiverse.SetViewport(ViewportMain);
         }
 
         /// <summary>
@@ -78,7 +89,8 @@ namespace HughFor
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Multiverse.Update(dt);
 
             base.Update(gameTime);
         }
@@ -89,10 +101,8 @@ namespace HughFor
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
-
+            GraphicsDevice.Clear(Color.White);
+            Multiverse.Draw();
             base.Draw(gameTime);
         }
     }

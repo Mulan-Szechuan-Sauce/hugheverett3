@@ -43,8 +43,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="HughFor.cs" />
-    <Compile Include="Concrete\TilesetManager.cs" />
-    <Compile Include="Enums\TileType.cs" />
+    <Compile Include="Concrete\*.cs" />
+    <Compile Include="Enums\*.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -70,6 +70,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />
 	<EmbeddedResource Include="Icon.bmp" />
+	<EmbeddedResource Include="Content\level1.tmx">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</EmbeddedResource>
+	<EmbeddedResource Include="Content\tileset.png">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</EmbeddedResource>
+	<EmbeddedResource Include="Content\tileset.tsx">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
