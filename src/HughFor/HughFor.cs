@@ -1,20 +1,31 @@
-﻿using Microsoft.Xna.Framework;
+﻿using HughFor.Concrete;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
+using System;
+using System.Collections.Generic;
+
+using TiledSharp;
+using Myra.Graphics2D;
+using Myra.Graphics2D.UI;
+using Myra.Utility;
 
 namespace HughFor
 {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class HughFor : Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        public GraphicsDeviceManager Graphics;
+        public SpriteBatch SpriteBatch;
+        public Viewport ViewportMain;
+        public TilesetManager TilesetManager;
         
-        public Game1()
+        public HughFor()
         {
-            graphics = new GraphicsDeviceManager(this);
+            Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
 
@@ -38,9 +49,14 @@ namespace HughFor
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            SpriteBatch = new SpriteBatch(GraphicsDevice);
+            TilesetManager = new TilesetManager(this);
 
-            // TODO: use this.Content to load your game content here
+            Graphics.PreferredBackBufferHeight = 720;
+            Graphics.PreferredBackBufferWidth = 1280;
+            Graphics.ApplyChanges();
+
+            ViewportMain = GraphicsDevice.Viewport;
         }
 
         /// <summary>

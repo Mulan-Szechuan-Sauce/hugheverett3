@@ -9,5 +9,5 @@ set -e
 cd src
 msbuild
 
-cd Hugh
-exec mono bin/DesktopGL/AnyCPU/Debug/Hugh.exe $1
+cd HughFor
+exec mono bin/DesktopGL/AnyCPU/Debug/HughFor.exe $1

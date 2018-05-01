@@ -42,7 +42,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Game1.cs" />
+    <Compile Include="HughFor.cs" />
+    <Compile Include="Concrete\TilesetManager.cs" />
+    <Compile Include="Enums\TileType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -52,6 +54,18 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
+    <Reference Include="TiledSharp">
+      <HintPath>..\packages\TiledSharp.0.15\lib\TiledSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Extended">
+      <HintPath>..\packages\MonoGame.Extended.0.6.568\lib\portable-net45+win8+wpa81\MonoGame.Extended.dll</HintPath>
+    </Reference>
+    <Reference Include="Myra">
+      <HintPath>..\packages\Myra.0.5.6.113\lib\net45\Myra.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />
@@ -104,6 +118,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="app.manifest" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
