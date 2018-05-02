@@ -14,6 +14,7 @@ namespace HughFor.Concrete
 {
     public class World
     {
+        private PlayerTile Player;
         // The interactive tile layer (the only layer for now)
         private Tile[] Tiles;
         private int width;
@@ -22,6 +23,16 @@ namespace HughFor.Concrete
         private HughFor Game;
 
         public Viewport Viewport { get; set; }
+
+        public bool HasDied
+        {
+            get => Player.HasDied;
+        }
+
+        public bool HasWon
+        {
+            get => Player.HasWon;
+        }
 
         public int Width
         {
@@ -76,7 +87,12 @@ namespace HughFor.Concrete
 
                 var tileType = Game.TilesetManager.GetTileType(gid);
 
-                Tiles[y * width + x] = new Tile(x, y, tileType, gid);
+                Tiles[y * width + x] = Tile.CreateTile(Game, x, y, gid, tileType);
+
+                if (tileType == TileType.Player)
+                {
+                    Player = (PlayerTile)Tiles[y * width + x];
+                }
             }
         }
 
@@ -137,6 +153,7 @@ namespace HughFor.Concrete
 
         private void DrawTiles()
         {
+            // TODO only bother drawing the tiles within the viewport (+ 1 tile for animations)
             for (int i = 0; i < width * height; i++)
             {
                 Tile t = Tiles[i];
@@ -146,12 +163,23 @@ namespace HughFor.Concrete
                     continue;
                 }
 
-                Game.TilesetManager.DrawGid(t.TilesetGid, t.RegionToDraw);
+                t.Draw();
             }
         }
 
         public void Update(float dt)
         {
+            for (int i = 0; i < width * height; i++)
+            {
+                Tile t = Tiles[i];
+
+                if (t == null)
+                {
+                    continue;
+                }
+
+                t.Update(dt, this);
+            }
         }
 
         public List<Tile> GetTilesWithinRect(Rectangle r)
@@ -184,5 +212,14 @@ namespace HughFor.Concrete
         }
 
         public Tile GetTile(int x, int y) => Tiles[y * Width + x];
+
+        // Warning: This doesn't handle overlaps. Do that in your entity Update code!
+        public void MoveTile(Tile t, int newX, int newY)
+        {
+            //Tiles[t.Y * Width + t.X] = null;
+            Tiles[newY * Width + newY] = t;
+            t.X = newX;
+            t.Y = newY;
+        }
     }
 }

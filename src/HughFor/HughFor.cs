@@ -3,13 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-using System;
-using System.Collections.Generic;
-
 using TiledSharp;
-using Myra.Graphics2D;
-using Myra.Graphics2D.UI;
-using Myra.Utility;
 
 namespace HughFor
 {
