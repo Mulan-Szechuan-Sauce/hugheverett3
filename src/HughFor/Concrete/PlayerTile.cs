@@ -69,6 +69,11 @@ namespace HughFor.Concrete
                 HasDied = onTile.Type == TileType.Death;
                 HasWon  = onTile.Type == TileType.Finish;
             }
+            else
+            {
+                HasDied = false;
+                HasWon  = false;
+            }
         }
 
         private void SetState(PlayerState state)
