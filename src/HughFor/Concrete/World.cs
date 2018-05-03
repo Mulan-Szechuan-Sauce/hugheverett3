@@ -87,12 +87,10 @@ namespace HughFor.Concrete
 
                 var tileType = Game.TilesetManager.GetTileType(gid);
 
-                Tiles[y * width + x] = Tile.CreateTile(Game, x, y, gid, tileType);
-
                 if (tileType == TileType.Player)
-                {
-                    Player = (PlayerTile)Tiles[y * width + x];
-                }
+                    Player = new PlayerTile(Game, x, y, gid);
+                else
+                    Tiles[y * width + x] = new Tile(Game, x, y, gid, tileType);
             }
         }
 
@@ -106,6 +104,7 @@ namespace HughFor.Concrete
                                    GetCameraTransform());
 
             DrawTiles();
+            Player.Draw();
             Game.SpriteBatch.End();
         }
 
@@ -180,6 +179,8 @@ namespace HughFor.Concrete
 
                 t.Update(dt, this);
             }
+
+            Player.Update(dt, this);
         }
 
         public List<Tile> GetTilesWithinRect(Rectangle r)
@@ -212,14 +213,5 @@ namespace HughFor.Concrete
         }
 
         public Tile GetTile(int x, int y) => Tiles[y * Width + x];
-
-        // Warning: This doesn't handle overlaps. Do that in your entity Update code!
-        public void MoveTile(Tile t, int newX, int newY)
-        {
-            Tiles[t.Y * Width + t.X] = null;
-            Tiles[newY * Width + newY] = t;
-            t.X = newX;
-            t.Y = newY;
-        }
     }
 }
