@@ -18,6 +18,8 @@ namespace HughFor
         public TilesetManager TilesetManager;
         public Multiverse Multiverse;
         public SpriteFont GameFont;
+
+        private string LevelName;
         
         public HughFor()
         {
@@ -61,6 +63,7 @@ namespace HughFor
 
         private void LoadLevel(string levelName)
         {
+            LevelName = levelName;
             TmxMap map = new TmxMap("Content/" + levelName + ".tmx");
             TilesetManager.LoadMap(map);
             Multiverse = new Multiverse(this, map);
@@ -83,8 +86,13 @@ namespace HughFor
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            var keyState = Keyboard.GetState();
+            if (keyState.IsKeyDown(Keys.Escape))
                 Exit();
+
+            // Restart
+            if (keyState.IsKeyDown(Keys.R))
+                LoadLevel(LevelName);
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
             Multiverse.Update(dt);
