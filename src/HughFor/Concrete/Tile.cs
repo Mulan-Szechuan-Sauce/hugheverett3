@@ -1,8 +1,7 @@
-using HughFor.Concrete;
+using System;
 using HughFor.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using System;
 
 namespace HughFor.Concrete
 {
@@ -21,6 +20,10 @@ namespace HughFor.Concrete
         public TileType Type;
 
         protected HughFor Game;
+
+        public Point Location {
+            get => new Point(X, Y);
+        }
 
         public Tile(HughFor game, int mapX, int mapY, int tilesetGid, TileType type)
         {
@@ -56,10 +59,10 @@ namespace HughFor.Concrete
         {
             switch (direction)
             {
-                case Direction.East:  return new Point(X + 1, Y);
-                case Direction.West:  return new Point(X - 1, Y);
-                case Direction.North: return new Point(X, Y - 1);
-                case Direction.South: return new Point(X, Y + 1);
+                case Direction.East:  return new Point(1, 0);
+                case Direction.West:  return new Point(-1, 0);
+                case Direction.North: return new Point(0, -1);
+                case Direction.South: return new Point(0, 1);
             }
             return Point.Zero;
         }
@@ -67,100 +70,91 @@ namespace HughFor.Concrete
 
     public class PlayerTile : Tile
     {
+        private enum PlayerState
+        {
+            Standing,
+            WalkingOut,
+            WalkingIn,
+        }
+
         public bool HasDied { get => false; }
         public bool HasWon  { get => false; }
 
         private Direction Direction;
         private Vector2 AnimationOffset;
 
+        private PlayerState State;
+
         public PlayerTile(HughFor game, int mapX, int mapY, int tilesetGid) :
             base(game, mapX, mapY, tilesetGid, TileType.Player)
         {
             Direction = Direction.None;
-            AnimationOffset = Vector2.Zero;
+            AnimationOffset = new Vector2(0, 0);
+            SetState(PlayerState.Standing);
         }
 
         public override void Update(float dt, World world)
         {
             const float ANIMATION_MOVE_SPEED = SIZE * 2; 
 
-            if (Direction == Direction.None)
+            if (State == PlayerState.Standing)
             {
                 if (Keyboard.GetState().IsKeyDown(Keys.Right))
-                    TryMoving(world, Direction.East);
+                    TryStartMoving(world, Direction.East);
                 else if (Keyboard.GetState().IsKeyDown(Keys.Left))
-                    TryMoving(world, Direction.West);
+                    TryStartMoving(world, Direction.West);
                 else if (Keyboard.GetState().IsKeyDown(Keys.Up))
-                    TryMoving(world, Direction.North);
+                    TryStartMoving(world, Direction.North);
                 else if (Keyboard.GetState().IsKeyDown(Keys.Down))
-                    TryMoving(world, Direction.South);
-                else
-                    AnimationOffset = Vector2.Zero;
+                    TryStartMoving(world, Direction.South);
             }
-            else
+
+            if (State == PlayerState.WalkingOut)
             {
-                // TODO Clean up this mess
+                Point dirPoint = PointForDirection(Direction);
+                Vector2 dirVector = dirPoint.ToVector2();
+                AnimationOffset += dirVector * ANIMATION_MOVE_SPEED * dt;
 
-                if (Direction == Direction.East)
+                if (AnimationOffset.Length() >= SIZE / 2)
                 {
-                    bool hasMoved = AnimationOffset.X < 0;
-                    AnimationOffset.X += (float)ANIMATION_MOVE_SPEED * dt;
+                    AnimationOffset -= dirVector * SIZE;
+                    SetState(PlayerState.WalkingIn);
 
-                    if (hasMoved)
-                    {
-                        // Animation has finished
-                        if (AnimationOffset.X >= 0)
-                        {
-                            Direction = Direction.None;
-                            AnimationOffset = Vector2.Zero;
-                        }
-                    }
-                    else
-                    {
-                        if (AnimationOffset.X > SIZE / 2)
-                        {
-                            AnimationOffset.X -= (float)SIZE;
-                            var dirPoint = PointForDirection(Direction);
-                            world.MoveTile(this, dirPoint.X, dirPoint.Y);
-                        }
-                    }
+                    world.MoveTile(this, X + dirPoint.X, Y + dirPoint.Y);
                 }
-                else if (Direction == Direction.West)
-                {
-                    bool hasMoved = AnimationOffset.X > 0;
-                    AnimationOffset.X -= (float)ANIMATION_MOVE_SPEED * dt;
+            }
+            else if (State == PlayerState.WalkingIn)
+            {
+                Vector2 dirVector = PointForDirection(Direction).ToVector2();
+                AnimationOffset += dirVector * ANIMATION_MOVE_SPEED * dt;
 
-                    if (hasMoved)
-                    {
-                        // Animation has finished
-                        if (AnimationOffset.X <= 0)
-                        {
-                            Direction = Direction.None;
-                            AnimationOffset = Vector2.Zero;
-                        }
-                    }
-                    else
-                    {
-                        if (AnimationOffset.X < - SIZE / 2)
-                        {
-                            AnimationOffset.X += (float)SIZE;
-                            var dirPoint = PointForDirection(Direction);
-                            world.MoveTile(this, dirPoint.X, dirPoint.Y);
-                        }
-                    }
+                // FIXME this will break if lag occurs
+                if (Math.Round(AnimationOffset.Length()) == 0)
+                {
+                    SetState(PlayerState.Standing);
+                    AnimationOffset = new Vector2(0, 0);
                 }
             }
         }
 
-        private void TryMoving(World world, Direction direction)
+        private void SetState(PlayerState state)
+        {
+            State = state;
+            Console.WriteLine("Setting state to: " + state.ToString());
+        }
+
+        private void TryStartMoving(World world, Direction direction)
         {
             if (CanMoveTowards(world, direction))
+            {
                 Direction = direction;
+                SetState(PlayerState.WalkingOut);
+            }
         }
 
         private bool CanMoveTowards(World world, Direction direction)
         {
-            var p = PointForDirection(direction);
+            var p = Location + PointForDirection(direction);
 
             if (p.X <= 0 || p.Y <= 0 || p.X >= world.Width || p.Y >= world.Height)
             {
@@ -174,9 +168,14 @@ namespace HughFor.Concrete
 
         public override void Draw()
         {
-            var rect = new Rectangle(X * SIZE + (int)AnimationOffset.X,
-                                     Y * SIZE + (int)AnimationOffset.Y,
-                                     SIZE, SIZE);
+            Rectangle rect = new Rectangle(X * SIZE, Y * SIZE, SIZE, SIZE);
+
+            if (State != PlayerState.Standing)
+            {
+                rect.X += (int)AnimationOffset.X;
+                rect.Y += (int)AnimationOffset.Y;
+            }
+
             Game.TilesetManager.DrawGid(TilesetGid, rect);
         }
     }

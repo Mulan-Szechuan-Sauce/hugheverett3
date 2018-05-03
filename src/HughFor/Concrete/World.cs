@@ -216,7 +216,7 @@ namespace HughFor.Concrete
         // Warning: This doesn't handle overlaps. Do that in your entity Update code!
         public void MoveTile(Tile t, int newX, int newY)
         {
-            //Tiles[t.Y * Width + t.X] = null;
+            Tiles[t.Y * Width + t.X] = null;
             Tiles[newY * Width + newY] = t;
             t.X = newX;
             t.Y = newY;
