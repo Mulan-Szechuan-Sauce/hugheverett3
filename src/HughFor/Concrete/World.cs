@@ -105,6 +105,14 @@ namespace HughFor.Concrete
 
             DrawTiles();
             Player.Draw();
+
+            if (Player.HasDied)
+            {
+                var pos = Player.Location.ToVector2() * Tile.SIZE;
+                pos.Y -= Tile.SIZE;
+                Game.SpriteBatch.DrawString(Game.GameFont, "R.I.P.", pos, Color.Black);
+            }
+
             Game.SpriteBatch.End();
         }
 

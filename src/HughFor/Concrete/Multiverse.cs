@@ -1,10 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TiledSharp;
 
 namespace HughFor.Concrete
@@ -19,6 +15,9 @@ namespace HughFor.Concrete
         private Viewport Viewport;
         private HughFor Game;
 
+        public bool HasWon { get; private set; }
+        public bool HasDied { get; private set; }
+
         public Multiverse(HughFor game, TmxMap map)
         {
             Game = game;
@@ -32,6 +31,9 @@ namespace HughFor.Concrete
 
             for (int i = 1; i <= LayoutHeight * LayoutWidth; i++)
                 Worlds.Add(new World(game, map, i));
+
+            HasWon = false;
+            HasDied = false;
         }
 
         public void SetViewport(Viewport viewport)
@@ -74,6 +76,34 @@ namespace HughFor.Concrete
 
         public void Update(float dt)
         {
+            if (HasWon || HasDied)
+            {
+                return;
+            }
+
+            bool hasWon = true;
+
+            foreach (World w in Worlds)
+            {
+                if (w.HasDied)
+                {
+                    HasDied = true;
+                    return;
+                }
+
+                // All worlds have to win before the level is complete
+                if (!w.HasWon)
+                {
+                    hasWon = false;
+                }
+            }
+
+            if (hasWon)
+            {
+                HasWon = true;
+                return;
+            }
+            
             Worlds.ForEach(w => w.Update(dt));
         }
 

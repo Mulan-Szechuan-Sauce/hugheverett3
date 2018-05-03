@@ -13,8 +13,8 @@ namespace HughFor.Concrete
             Walking,
         }
 
-        public bool HasDied { get => false; }
-        public bool HasWon  { get => false; }
+        public bool HasDied { get; private set; }
+        public bool HasWon  { get; private set; }
 
         private Direction Direction;
         private Vector2 AnimationOffset;
@@ -27,6 +27,9 @@ namespace HughFor.Concrete
             Direction = Direction.None;
             AnimationOffset = Vector2.Zero;
             SetState(PlayerState.Standing);
+
+            HasDied = false;
+            HasWon = false;
         }
 
         public override void Update(float dt, World world)
@@ -58,6 +61,13 @@ namespace HughFor.Concrete
                     this.X += dirPoint.X;
                     this.Y += dirPoint.Y;
                 }
+            }
+
+            Tile onTile = world.GetTile(X, Y);
+            if (onTile != null)
+            {
+                HasDied = onTile.Type == TileType.Death;
+                HasWon  = onTile.Type == TileType.Finish;
             }
         }
 

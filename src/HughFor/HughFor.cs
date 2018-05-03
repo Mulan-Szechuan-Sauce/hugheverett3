@@ -17,6 +17,7 @@ namespace HughFor
         public Viewport ViewportMain;
         public TilesetManager TilesetManager;
         public Multiverse Multiverse;
+        public SpriteFont GameFont;
         
         public HughFor()
         {
@@ -52,6 +53,8 @@ namespace HughFor
             Graphics.ApplyChanges();
 
             ViewportMain = GraphicsDevice.Viewport;
+
+            GameFont = Content.Load<SpriteFont>("GameFont");
 
             LoadLevel("level1");
         }
@@ -97,6 +100,15 @@ namespace HughFor
         {
             GraphicsDevice.Clear(Color.White);
             Multiverse.Draw();
+
+            if (Multiverse.HasWon)
+            {
+                SpriteBatch.Begin();
+                SpriteBatch.DrawString(GameFont, "VERY NICE. GREAT SUCCESS!",
+                                       new Vector2(10, 10), Color.Black);
+                SpriteBatch.End();
+            }
+
             base.Draw(gameTime);
         }
     }
